@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>{{ event.name }} · Accurova</title>
+<meta name="description" content="Official photography partner for {{ event.name }}. Get your event photos, connect with Accurova." />
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Official Photography Partner</p>
+  <p class="brand">Accur<span>ova</span></p>
+  <div class="badge-row">
+    <span class="badge">SME500 AWARD 2026</span>
+    <span class="badge">★ 5.0 GOOGLE</span>
+    <span class="badge">900+ SHOOTS</span>
+  </div>
+
+  <hr class="hairline" />
+
+  <h1 class="event-name">{{ event.name }}</h1>
+  <p class="event-meta">{% if event.client_name %}{{ event.client_name }} &middot; {% endif %}{{ event.event_date or "" }}</p>
+
+  {% if event.status == "photos_ready" and event.gallery_url %}
+  <div class="card card-primary">
+    <p class="card-title">Your photos are ready</p>
+    <p class="card-desc">The full gallery from today's event has been processed and is ready to view and download.</p>
+    <a class="btn btn-primary" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
+  </div>
+  {% else %}
+  <div class="card card-primary">
+    <p class="card-title">Get today's event photos</p>
+    <p class="card-desc">Photos are still being processed. Leave your email and we'll notify you the moment they're ready.</p>
+    <form id="signup-form">
+      <input type="email" id="signup-email" name="email" placeholder="you@company.com" required autocomplete="email" />
+      <button type="submit" class="btn btn-primary">Notify Me</button>
+    </form>
+    <div id="signup-status" class="status-msg"></div>
+    <p class="form-note">We'll only use this to send your event photo link. No spam.</p>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <p class="card-title">Connect on LinkedIn</p>
+    <p class="card-desc">Follow Accurova for recent work, event coverage, and studio updates.</p>
+    <a class="btn btn-outline" href="{{ linkedin_url }}" target="_blank" rel="noopener">Connect on LinkedIn</a>
+  </div>
+
+  <div class="card">
+    <p class="card-title">View our portfolio</p>
+    <p class="card-desc">Browse recent corporate events, brand shoots, and editorial work.</p>
+    <a class="btn btn-outline" href="{{ portfolio_url }}" target="_blank" rel="noopener">View Portfolio</a>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Book a corporate consultation</p>
+    <p class="card-desc">Planning your next event or shoot? Tell us a bit about it.</p>
+    <button class="btn btn-gold" id="open-enquiry">Book a Consultation</button>
+  </div>
+
+  <div class="card">
+    <p class="card-title">WhatsApp us</p>
+    <p class="card-desc">Fastest way to reach the team directly.</p>
+    <a class="btn btn-outline" href="{{ whatsapp_link }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+  </div>
+
+  <!-- Enquiry form (hidden until opened) -->
+  <div class="card" id="enquiry-card" style="display:none;">
+    <p class="card-title">Tell us about your event</p>
+    <form id="enquiry-form">
+      <input type="text" name="name" placeholder="Your name" required />
+      <input type="text" name="company" placeholder="Company" />
+      <input type="email" name="email" placeholder="Email" required />
+      <select name="event_type">
+        <option value="">Event type</option>
+        <option value="corporate_conference">Corporate conference</option>
+        <option value="product_launch">Product launch</option>
+        <option value="gala_dinner">Gala / dinner</option>
+        <option value="branding_shoot">Branding shoot</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea name="message" placeholder="A little about your event"></textarea>
+      <button type="submit" class="btn btn-gold">Send Enquiry</button>
+    </form>
+    <div id="enquiry-status" class="status-msg"></div>
+  </div>
+
+  <footer>ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA</footer>
+</div>
+
+<script>
+const EVENT_SLUG = {{ event.slug|tojson }};
+
+function showStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.classList.remove('ok', 'err');
+  el.classList.add('show', ok ? 'ok' : 'err');
+}
+
+const signupForm = document.getElementById('signup-form');
+if (signupForm) {
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('signup-status');
+    const email = document.getElementById('signup-email').value.trim();
+    const btn = signupForm.querySelector('button');
+    btn.disabled = true;
+    try {
+      const res = await fetch(`/e/${EVENT_SLUG}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showStatus(statusEl, "You're on the list — we'll email you the moment photos are ready.", true);
+        signupForm.reset();
+      } else {
+        showStatus(statusEl, data.detail || 'Something went wrong. Please try again.', false);
+      }
+    } catch (err) {
+      showStatus(statusEl, 'Network error. Please try again.', false);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
+document.getElementById('open-enquiry').addEventListener('click', () => {
+  const card = document.getElementById('enquiry-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+  if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+const enquiryForm = document.getElementById('enquiry-form');
+enquiryForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const statusEl = document.getElementById('enquiry-status');
+  const btn = enquiryForm.querySelector('button');
+  const formData = new FormData(enquiryForm);
+  const payload = Object.fromEntries(formData.entries());
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/e/${EVENT_SLUG}/enquiry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showStatus(statusEl, "Thanks — we'll be in touch shortly.", true);
+      enquiryForm.reset();
+    } else {
+      showStatus(statusEl, data.detail || 'Something went wrong. Please try again.', false);
+    }
+  } catch (err) {
+    showStatus(statusEl, 'Network error. Please try again.', false);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [feature/**, dev, main]
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Initialize DB (schema sanity check)
+        run: |
+          cp .env.example .env
+          python migrations/init_db.py
+
+      - name: Import app (catches wiring/syntax errors)
+        run: python -c "from app.main import app; print('app imports cleanly')"

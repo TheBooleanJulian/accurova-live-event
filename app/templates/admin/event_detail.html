@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ event.name }} · Admin · Accurova</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="top-bar">
+    <div>
+      <p class="eyebrow">Accurova / Admin</p>
+      <p class="brand">{{ event.name }}</p>
+    </div>
+    <a class="link-btn" href="/admin">&larr; All events</a>
+  </div>
+  <hr class="hairline" />
+
+  {% if message %}
+  <div class="status-msg show ok">{{ message }}</div>
+  {% endif %}
+
+  <div class="card card-primary">
+    <p class="card-title">Event settings</p>
+    <form method="post" action="/admin/events/{{ event.id }}">
+      <input type="text" name="name" value="{{ event.name }}" placeholder="Event name" required />
+      <input type="text" name="client_name" value="{{ event.client_name or '' }}" placeholder="Client name" />
+      <input type="text" name="event_date" value="{{ event.event_date or '' }}" placeholder="Event date (YYYY-MM-DD)" />
+      <input type="text" name="gallery_url" value="{{ event.gallery_url or '' }}" placeholder="LuxSync gallery URL" />
+      <select name="status">
+        <option value="upcoming" {% if event.status == "upcoming" %}selected{% endif %}>upcoming</option>
+        <option value="live" {% if event.status == "live" %}selected{% endif %}>live</option>
+        <option value="photos_ready" {% if event.status == "photos_ready" %}selected{% endif %}>photos_ready</option>
+      </select>
+      <p class="form-note">Setting status to <strong>photos_ready</strong> (with a gallery URL) swaps the public page to the direct download button and emails everyone on the signup list for this event.</p>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Email signups ({{ signups|length }})</p>
+    <a class="link-btn" href="/admin/events/{{ event.id }}/signups.csv">Export CSV</a>
+    <table>
+      <thead><tr><th>Email</th><th>Signed up</th><th>Notified</th></tr></thead>
+      <tbody>
+        {% for s in signups %}
+        <tr><td>{{ s.email }}</td><td>{{ s.created_at }}</td><td>{{ s.notified_at or "—" }}</td></tr>
+        {% else %}
+        <tr><td colspan="3" style="color:var(--ink-faint);">No signups yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Enquiries ({{ enquiries|length }})</p>
+    <a class="link-btn" href="/admin/events/{{ event.id }}/enquiries.csv">Export CSV</a>
+    <table>
+      <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Type</th><th>Message</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for q in enquiries %}
+        <tr>
+          <td>{{ q.name }}</td><td>{{ q.company or "—" }}</td><td>{{ q.email }}</td>
+          <td>{{ q.event_type or "—" }}</td><td>{{ q.message or "—" }}</td><td>{{ q.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" style="color:var(--ink-faint);">No enquiries yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

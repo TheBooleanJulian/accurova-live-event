@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Login · Accurova</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Accurova / Admin</p>
+  <p class="brand">Accur<span>ova</span></p>
+  <hr class="hairline" />
+  <div class="card card-primary">
+    <p class="card-title">Admin login</p>
+    {% if error %}
+    <div class="status-msg show err">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/admin/login">
+      <input type="password" name="password" placeholder="Admin password" required autofocus />
+      <button type="submit" class="btn btn-primary">Log in</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

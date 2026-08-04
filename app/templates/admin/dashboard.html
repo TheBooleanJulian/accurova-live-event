@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Accurova</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="top-bar">
+    <div>
+      <p class="eyebrow">Accurova / Admin</p>
+      <p class="brand">Events</p>
+    </div>
+    <a class="link-btn" href="/admin/logout">Log out</a>
+  </div>
+  <hr class="hairline" />
+
+  <div class="card card-primary">
+    <p class="card-title">Create event</p>
+    <form method="post" action="/admin/events">
+      <input type="text" name="name" placeholder="Event name" required />
+      <input type="text" name="client_name" placeholder="Client name" />
+      <input type="text" name="event_date" placeholder="Event date (YYYY-MM-DD)" />
+      <input type="text" name="slug" placeholder="Slug (leave blank to auto-generate)" />
+      <button type="submit" class="btn btn-primary">Create Event</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <p class="card-title">All events</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Signups</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td>{{ e.name }}<br /><span style="color:var(--ink-faint); font-family:var(--font-mono); font-size:10px;">/e/{{ e.slug }}</span></td>
+          <td><span class="status-pill status-{{ e.status }}">{{ e.status }}</span></td>
+          <td>{{ e.event_date or "—" }}</td>
+          <td>{{ e.signup_count }}</td>
+          <td class="row-actions">
+            <a href="/admin/events/{{ e.id }}">Manage</a>
+            <a href="/e/{{ e.slug }}" target="_blank">View public page</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" style="color:var(--ink-faint);">No events yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>
