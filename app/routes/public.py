@@ -16,10 +16,14 @@ templates = Jinja2Templates(directory="app/templates")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
-def _whatsapp_link(prefill: str) -> str:
+def whatsapp_link(prefill: str) -> str:
     from urllib.parse import quote
     number = settings.WHATSAPP_NUMBER
     return f"https://wa.me/{number}?text={quote(prefill)}"
+
+
+# kept for internal call sites within this module
+_whatsapp_link = whatsapp_link
 
 
 @router.get("/e/{slug}", response_class=HTMLResponse)
