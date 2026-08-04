@@ -26,16 +26,20 @@ if not DB_PATH.is_absolute():
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
 
-def main() -> None:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+def init_db(db_path: Path = DB_PATH) -> None:
+    db_path.parent.mkdir(parents=True, exist_ok=True)
     sql = SCHEMA_PATH.read_text()
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(db_path)
     try:
         conn.executescript(sql)
         conn.commit()
-        print(f"[init_db] schema applied -> {DB_PATH}")
     finally:
         conn.close()
+
+
+def main() -> None:
+    init_db()
+    print(f"[init_db] schema applied -> {DB_PATH}")
 
 
 if __name__ == "__main__":

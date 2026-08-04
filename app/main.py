@@ -3,12 +3,23 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from migrations.init_db import init_db
 from app.routes import public, admin
 from app.routes.public import whatsapp_link
 from app.config import settings
 from app.db import query_one
 
 app = FastAPI(title="Accurova Live Event", docs_url=None, redoc_url=None)
+
+
+@app.on_event("startup")
+def _apply_schema() -> None:
+    """
+    Run unconditionally so a Zeabur (or any) deploy that skips the build-step
+    migration doesn't leave the DB without tables — CREATE ... IF NOT EXISTS
+    makes this a no-op once the schema already exists.
+    """
+    init_db(settings.DB_PATH)
 
 templates = Jinja2Templates(directory="app/templates")
 
