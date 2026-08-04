@@ -21,12 +21,12 @@ class Settings:
     ADMIN_PASSWORD: str = os.environ.get("ADMIN_PASSWORD", "changeme")
     PUBLIC_BASE_URL: str = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
 
-    WHATSAPP_NUMBER: str = os.environ.get("WHATSAPP_NUMBER", "")
-    LINKEDIN_URL: str = os.environ.get("LINKEDIN_URL", "https://www.linkedin.com/company/accurova")
-    PORTFOLIO_URL: str = os.environ.get("PORTFOLIO_URL", "https://accurova.com/portfolio")
+    WHATSAPP_NUMBER: str = os.environ.get("WHATSAPP_NUMBER", "+6598566543")
+    LINKEDIN_URL: str = os.environ.get("LINKEDIN_URL", "https://www.linkedin.com/in/juliancheungjunyan/")
+    PORTFOLIO_URL: str = os.environ.get("PORTFOLIO_URL", "https://accurova.com/")
 
     EMAIL_PROVIDER: str = os.environ.get("EMAIL_PROVIDER", "none").lower()
-    EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "Accurova <hello@accurova.com>")
+    EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "Accurova <juliancheung@accurova.com>")
 
     RESEND_API_KEY: str = os.environ.get("RESEND_API_KEY", "")
     POSTMARK_SERVER_TOKEN: str = os.environ.get("POSTMARK_SERVER_TOKEN", "")
