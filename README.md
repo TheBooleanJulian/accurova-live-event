@@ -66,7 +66,7 @@ All variables are documented in `.env.example`. The important ones:
 | `SESSION_SECRET` | Signs the admin session cookie — generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `ADMIN_PASSWORD` | Single-operator admin password |
 | `PUBLIC_BASE_URL` | Base URL of the deployment |
-| `WHATSAPP_NUMBER` | Digits only, no `+`, e.g. `6580001234` |
+| `WHATSAPP_NUMBER` | Full international number for `wa.me` links, e.g. `6580001234` or `+6580001234` (both work) |
 | `LINKEDIN_URL` / `PORTFOLIO_URL` | Outbound links on the public page |
 | `EMAIL_PROVIDER` | `resend` \| `postmark` \| `smtp` \| `none` |
 | `EMAIL_FROM` | From header used for notification emails |
@@ -136,6 +136,17 @@ Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`)
 - **MINOR** — backwards-compatible features (new admin capability, new
   public-page flow, new env var with a safe default)
 - **PATCH** — backwards-compatible fixes and small tweaks
+
+### [1.0.1] - 2026-08-05
+
+#### Fixed
+
+- Bare-domain (`/`) visits no longer redirect to `/admin` — they land on the
+  single live event or a generic branded page with WhatsApp/LinkedIn/
+  portfolio CTAs instead.
+- DB schema is now applied automatically on app startup, so deployments that
+  skip the `python migrations/init_db.py` build step no longer 500 on every
+  request.
 
 ### [1.0.0] - 2026-08-04
 
