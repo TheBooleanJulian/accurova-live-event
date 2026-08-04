@@ -126,3 +126,80 @@ re-emailed.
   swap it for a shared store (Redis) or move throttling to the edge.
 - CSV exports are available per-event from the event detail page
   (`/admin/events/{id}/signups.csv` and `.../enquiries.csv`).
+
+## Changelog
+
+Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+
+- **MAJOR** — breaking changes (schema changes requiring migration, removed
+  routes/env vars, incompatible API changes)
+- **MINOR** — backwards-compatible features (new admin capability, new
+  public-page flow, new env var with a safe default)
+- **PATCH** — backwards-compatible fixes and small tweaks
+
+### [1.0.0] - 2026-08-04
+
+#### Added
+
+- Public event landing page (`/e/{slug}`) with email-capture signup form.
+- Admin dashboard: login, event CRUD, per-event signup/enquiry views, CSV
+  export.
+- "Photos ready" flow — set `gallery_url` + flip `status` to `photos_ready`
+  to notify all signups by email and swap the public page to a download
+  button.
+- Pluggable email sending via Resend, Postmark, or SMTP (or `none` for
+  local dev).
+- IP-based rate limiting on signup/enquiry endpoints.
+- SQLite storage (raw SQL, no ORM) with idempotent schema migrations.
+- CI workflow for lint/build checks on push.
+- Deployment docs for Zeabur (`feature → dev → main` branching).
+
+## Future roadmap
+
+Ideas under consideration, roughly in priority order:
+
+- **Multi-admin / role-based access** — move off the single shared
+  `ADMIN_PASSWORD` toward per-operator accounts with scoped permissions.
+- **Event templates & duplication** — clone a past event's settings
+  (branding, links, email copy) instead of re-entering them each time.
+- **In-app QR code generation** — generate and download the `/e/{slug}` QR
+  code straight from the admin dashboard instead of a separate tool.
+- **Signup analytics** — scan counts, signup conversion rate, and
+  time-to-notify per event, surfaced on the event detail page.
+- **Native photo gallery hosting** — optional built-in gallery instead of
+  always linking out to an external `gallery_url` (e.g. LuxSync).
+- **SMS notifications** — alongside email, for attendees who prefer text
+  when photos are ready.
+- **Shared-store rate limiting** — swap the in-memory limiter for Redis (or
+  edge-level throttling) to support multi-instance deployments.
+- **Automated test suite** — unit/integration tests for the signup,
+  enquiry, and photos-ready notification flows.
+- **Admin audit log** — track who changed event status/gallery URLs and
+  when, useful once multi-admin access lands.
+- **CRM/webhook integration** — push new signups and enquiries to
+  Zapier/Make or a webhook endpoint in real time.
+
+Have another idea? Open an issue or use the feedback form below.
+
+## Feedback & bug reports
+
+Found a bug or have feedback? Submit it via
+[this form](https://forms.gle/qRCimSyoosWyNwXdA).
+
+## License
+
+This project is dual licensed.
+
+- Community Edition — [GNU Affero General Public License v3 (AGPLv3)](LICENSE).
+  Free to use, modify, and self-host. If you distribute a modified version
+  or run it as a network service, you must make the corresponding source
+  available.
+- Commercial License — for organisations that want to embed, modify, or
+  distribute this software without AGPLv3's obligations. See
+  [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).
+
+---
+
+<div align="center">
+<sub>Built by <a href="https://github.com/TheBooleanJulian">@TheBooleanJulian</a></sub>
+</div>
