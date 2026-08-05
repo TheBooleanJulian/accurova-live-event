@@ -125,6 +125,7 @@ Deployed on Zeabur via GitHub CI/CD. Push to `main` triggers deploy. Branch flow
 - Shared-store rate limiting — swap the in-memory limiter for Redis (or edge-level throttling) to support multi-instance deployments
 - Admin audit log — track who changed event status/gallery URLs and when, useful once multi-admin access lands
 - CRM/webhook integration — push new signups and enquiries to Zapier/Make or a webhook endpoint in real time
+- "Past 7 events" showcase — surface the 7 most recent completed events (name, date, thumbnail/link) on the generic bare-domain landing page as social proof for visitors with no live event to land on
 
 Have another idea? Open an issue or use the feedback form below.
 
