@@ -65,11 +65,10 @@ Visit `http://localhost:8000/admin`, log in with `ADMIN_PASSWORD`, create an eve
 | `DB_PATH` | Yes | Path to the SQLite file (e.g. `./data/live_event.db`) |
 | `UPLOADS_DIR` | No | Directory for uploaded event thumbnails, served at `/uploads/*` (default: `./data/uploads`) |
 | `PUBLIC_BASE_URL` | Yes | Base URL of the deployment |
-| `WHATSAPP_NUMBER` | No | Full international number for `wa.me` links, e.g. `6580001234` or `+6580001234` |
+| `WHATSAPP_URL` | No | Single destination every "Message on WhatsApp" CTA site-wide links to |
 | `LINKEDIN_URL` / `LINKEDIN_COMPANY_URL` | No | Personal and company LinkedIn links shown as two buttons on the public page |
 | `PORTFOLIO_URL` | No | Outbound portfolio link shown on the public event page |
 | `GOOGLE_REVIEWS_URL` / `SME_AWARD_URL` | No | Destinations for the "★ 5.0 GOOGLE" and "SME500 AWARD" badges |
-| `CONSULTATION_WHATSAPP_URL` | No | wa.link destination for the homepage "Book Consultation" button |
 | `EMAIL_PROVIDER` | No | `resend` \| `postmark` \| `smtp` \| `none` (default: `none`) |
 | `EMAIL_FROM` | No | From header used for notification emails |
 | `RESEND_API_KEY` | No | Required if `EMAIL_PROVIDER=resend` |
