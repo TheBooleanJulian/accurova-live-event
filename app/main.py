@@ -77,6 +77,8 @@ def root(request: Request):
             "whatsapp_link": whatsapp_link("Hi Accurova, I'd like to enquire about photography for my event."),
             "linkedin_url": settings.LINKEDIN_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
+            "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
+            "sme_award_url": settings.SME_AWARD_URL,
             "past_events": past_events,
         },
     )

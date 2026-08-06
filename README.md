@@ -66,6 +66,7 @@ Visit `http://localhost:8000/admin`, log in with `ADMIN_PASSWORD`, create an eve
 | `PUBLIC_BASE_URL` | Yes | Base URL of the deployment |
 | `WHATSAPP_NUMBER` | No | Full international number for `wa.me` links, e.g. `6580001234` or `+6580001234` |
 | `LINKEDIN_URL` / `PORTFOLIO_URL` | No | Outbound links shown on the public event page |
+| `GOOGLE_REVIEWS_URL` / `SME_AWARD_URL` | No | Destinations for the "★ 5.0 GOOGLE" and "SME500 AWARD" badges |
 | `EMAIL_PROVIDER` | No | `resend` \| `postmark` \| `smtp` \| `none` (default: `none`) |
 | `EMAIL_FROM` | No | From header used for notification emails |
 | `RESEND_API_KEY` | No | Required if `EMAIL_PROVIDER=resend` |
