@@ -44,6 +44,7 @@ def event_landing(request: Request, slug: str):
             "request": request,
             "event": event,
             "linkedin_url": settings.LINKEDIN_URL,
+            "linkedin_company_url": settings.LINKEDIN_COMPANY_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
