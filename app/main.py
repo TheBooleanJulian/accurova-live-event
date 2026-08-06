@@ -60,12 +60,14 @@ def root(request: Request):
     directly — it's never linked from here.
     """
     latest_event = query_one(
-        "SELECT id, slug, name, event_date, thumbnail_path FROM events ORDER BY COALESCE(event_date, created_at) DESC LIMIT 1"
+        """SELECT id, slug, name, event_date, thumbnail_path FROM events
+           WHERE show_on_homepage = 1
+           ORDER BY COALESCE(event_date, created_at) DESC LIMIT 1"""
     )
 
     past_events = query_all(
         """SELECT slug, name, event_date, thumbnail_path FROM events
-           WHERE thumbnail_path IS NOT NULL AND id != ?
+           WHERE show_on_homepage = 1 AND thumbnail_path IS NOT NULL AND id != ?
            ORDER BY COALESCE(event_date, created_at) DESC LIMIT 7""",
         (latest_event["id"] if latest_event else -1,),
     )
@@ -75,11 +77,12 @@ def root(request: Request):
         {
             "request": request,
             "whatsapp_url": settings.WHATSAPP_URL,
+            "whatsapp_display_number": settings.WHATSAPP_DISPLAY_NUMBER,
             "linkedin_url": settings.LINKEDIN_URL,
-            "linkedin_company_url": settings.LINKEDIN_COMPANY_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
+            "contact_name": settings.CONTACT_NAME,
             "latest_event": latest_event,
             "past_events": past_events,
         },

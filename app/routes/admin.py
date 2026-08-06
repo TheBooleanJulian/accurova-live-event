@@ -185,6 +185,19 @@ def create_event(
     return RedirectResponse("/admin", status_code=303)
 
 
+@router.post("/events/{event_id}/toggle-homepage")
+def toggle_homepage(request: Request, event_id: int, show_on_homepage: str = Form("off")):
+    if not _is_logged_in(request):
+        return RedirectResponse("/admin/login", status_code=303)
+
+    with db_cursor() as cur:
+        cur.execute(
+            "UPDATE events SET show_on_homepage = ? WHERE id = ?",
+            (1 if show_on_homepage == "on" else 0, event_id),
+        )
+    return RedirectResponse("/admin", status_code=303)
+
+
 # --- Event detail / edit ---
 
 @router.get("/events/{event_id}", response_class=HTMLResponse)

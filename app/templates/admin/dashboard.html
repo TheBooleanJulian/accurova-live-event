@@ -46,6 +46,7 @@
           <th>Status</th>
           <th>Date</th>
           <th>Signups</th>
+          <th>On homepage</th>
           <th></th>
         </tr>
       </thead>
@@ -56,13 +57,18 @@
           <td><span class="status-pill status-{{ e.status }}">{{ e.status }}</span></td>
           <td>{{ e.event_date or "—" }}</td>
           <td>{{ e.signup_count }}</td>
+          <td>
+            <form method="post" action="/admin/events/{{ e.id }}/toggle-homepage">
+              <input type="checkbox" name="show_on_homepage" value="on" style="width:auto;" {% if e.show_on_homepage %}checked{% endif %} onchange="this.form.requestSubmit()" />
+            </form>
+          </td>
           <td class="row-actions">
             <a href="/admin/events/{{ e.id }}">Manage</a>
             <a href="/e/{{ e.slug }}" target="_blank">View public page</a>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="5" style="color:var(--ink-faint);">No events yet.</td></tr>
+        <tr><td colspan="6" style="color:var(--ink-faint);">No events yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

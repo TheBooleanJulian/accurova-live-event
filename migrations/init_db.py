@@ -43,6 +43,7 @@ def init_db(db_path: Path = DB_PATH) -> None:
         conn.executescript(sql)
         _add_column_if_missing(conn, "events", "thumbnail_path", "TEXT")
         _add_column_if_missing(conn, "events", "gallery_password", "TEXT")
+        _add_column_if_missing(conn, "events", "show_on_homepage", "INTEGER NOT NULL DEFAULT 1")
         _add_column_if_missing(conn, "email_signups", "name", "TEXT")
         conn.commit()
     finally:

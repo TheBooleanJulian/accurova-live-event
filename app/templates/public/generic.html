@@ -54,13 +54,18 @@
   <div class="card card-primary">
     <p class="card-title">Looking for your event photos?</p>
     <p class="card-desc">Scan the QR code from your event to get to the right page, or message us directly and we'll help you find it.</p>
-    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message us at {{ whatsapp_display_number }}</a>
   </div>
 
   <div class="card">
     <p class="card-title">Connect on LinkedIn</p>
     <a class="btn btn-outline" href="{{ linkedin_url }}" target="_blank" rel="noopener">Julian Cheung Jun Yan</a>
-    <a class="btn btn-outline" href="{{ linkedin_company_url }}" target="_blank" rel="noopener">Accurova</a>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Save our contact</p>
+    <p class="card-desc">Add {{ contact_name }} directly to your phone contacts.</p>
+    <a class="btn btn-outline" href="/contact.vcf">Save {{ contact_name }} to your contacts</a>
   </div>
 
   <div class="card">
@@ -77,7 +82,7 @@
   <div class="card">
     <p class="card-title">WhatsApp us</p>
     <p class="card-desc">Fastest way to reach the team directly.</p>
-    <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+    <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message us at {{ whatsapp_display_number }}</a>
   </div>
 
   <!-- Enquiry form (hidden until opened) -->

@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS events (
     gallery_url TEXT,                -- nullable; set by admin once LuxSync gallery is ready
     gallery_password TEXT,           -- nullable; shown with a copy-to-clipboard button on the public page
     thumbnail_path TEXT,             -- nullable; web path to an uploaded thumbnail (e.g. /uploads/event_3.jpg)
+    show_on_homepage INTEGER NOT NULL DEFAULT 1,  -- 0/1; admin-controlled visibility in the homepage carousel
     status TEXT NOT NULL DEFAULT 'upcoming'  -- upcoming | live | photos_ready
         CHECK (status IN ('upcoming', 'live', 'photos_ready')),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

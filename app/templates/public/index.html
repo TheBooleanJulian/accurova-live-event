@@ -59,13 +59,18 @@
     <p class="card-title">Connect on LinkedIn</p>
     <p class="card-desc">Follow Accurova for recent work, event coverage, and studio updates.</p>
     <a class="btn btn-outline" href="{{ linkedin_url }}" target="_blank" rel="noopener">Julian Cheung Jun Yan</a>
-    <a class="btn btn-outline" href="{{ linkedin_company_url }}" target="_blank" rel="noopener">Accurova</a>
   </div>
 
   <div class="card">
     <p class="card-title">View our portfolio</p>
     <p class="card-desc">Browse recent corporate events, brand shoots, and editorial work.</p>
     <a class="btn btn-outline" href="{{ portfolio_url }}" target="_blank" rel="noopener">Accurova.com</a>
+  </div>
+
+  <div class="card">
+    <p class="card-title">Save our contact</p>
+    <p class="card-desc">Add {{ contact_name }} directly to your phone contacts.</p>
+    <a class="btn btn-outline" href="/contact.vcf">Save {{ contact_name }} to your contacts</a>
   </div>
 
   <div class="card">
@@ -77,7 +82,7 @@
   <div class="card">
     <p class="card-title">WhatsApp us</p>
     <p class="card-desc">Fastest way to reach the team directly.</p>
-    <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+    <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message us at {{ whatsapp_display_number }}</a>
   </div>
 
   <!-- Enquiry form (hidden until opened) -->

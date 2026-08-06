@@ -2,7 +2,7 @@ import re
 import sqlite3
 
 from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, EmailStr, field_validator
 
@@ -23,7 +23,11 @@ def event_landing(request: Request, slug: str):
     if not event:
         return templates.TemplateResponse(
             "public/not_found.html",
-            {"request": request, "whatsapp_url": settings.WHATSAPP_URL},
+            {
+                "request": request,
+                "whatsapp_url": settings.WHATSAPP_URL,
+                "whatsapp_display_number": settings.WHATSAPP_DISPLAY_NUMBER,
+            },
             status_code=404,
         )
 
@@ -33,12 +37,33 @@ def event_landing(request: Request, slug: str):
             "request": request,
             "event": event,
             "linkedin_url": settings.LINKEDIN_URL,
-            "linkedin_company_url": settings.LINKEDIN_COMPANY_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
             "whatsapp_url": settings.WHATSAPP_URL,
+            "whatsapp_display_number": settings.WHATSAPP_DISPLAY_NUMBER,
+            "contact_name": settings.CONTACT_NAME,
         },
+    )
+
+
+@router.get("/contact.vcf")
+def contact_vcard():
+    """One-click 'save to contacts' — vCard for the primary contact, shared across pages."""
+    digits = "".join(ch for ch in settings.WHATSAPP_DISPLAY_NUMBER if ch.isdigit() or ch == "+")
+    vcard = (
+        "BEGIN:VCARD\r\n"
+        "VERSION:3.0\r\n"
+        f"FN:{settings.CONTACT_NAME}\r\n"
+        "N:Cheung;Julian;;;\r\n"
+        "ORG:Accurova\r\n"
+        f"TEL;TYPE=CELL,VOICE:{digits}\r\n"
+        "END:VCARD\r\n"
+    )
+    return Response(
+        content=vcard,
+        media_type="text/vcard",
+        headers={"Content-Disposition": f'attachment; filename="{settings.CONTACT_NAME}.vcf"'},
     )
 
 
