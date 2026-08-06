@@ -196,20 +196,11 @@ def event_detail(request: Request, event_id: int, message: str = "", error: str 
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    signups = query_all(
-        "SELECT * FROM email_signups WHERE event_id = ? ORDER BY created_at DESC", (event_id,)
-    )
-    enquiries = query_all(
-        "SELECT * FROM enquiries WHERE event_id = ? ORDER BY created_at DESC", (event_id,)
-    )
-
     return templates.TemplateResponse(
         "admin/event_detail.html",
         {
             "request": request,
             "event": event,
-            "signups": signups,
-            "enquiries": enquiries,
             "message": message,
             "error": error,
         },
@@ -363,28 +354,61 @@ def _csv_response(rows, fieldnames, filename):
     )
 
 
-@router.get("/events/{event_id}/signups.csv")
-def export_signups_csv(request: Request, event_id: int):
+@router.get("/signups", response_class=HTMLResponse)
+def all_signups(request: Request):
     if not _is_logged_in(request):
         return RedirectResponse("/admin/login", status_code=303)
     rows = query_all(
-        "SELECT name, email, created_at, notified_at FROM email_signups WHERE event_id = ? ORDER BY created_at",
-        (event_id,),
+        """SELECT s.name, s.email, s.created_at, s.notified_at, e.name AS event_name
+           FROM email_signups s
+           JOIN events e ON e.id = s.event_id
+           ORDER BY s.created_at DESC"""
     )
-    return _csv_response(rows, ["name", "email", "created_at", "notified_at"], f"signups_event_{event_id}.csv")
+    return templates.TemplateResponse("admin/signups.html", {"request": request, "signups": rows})
 
 
-@router.get("/events/{event_id}/enquiries.csv")
-def export_enquiries_csv(request: Request, event_id: int):
+@router.get("/signups.csv")
+def export_all_signups_csv(request: Request):
     if not _is_logged_in(request):
         return RedirectResponse("/admin/login", status_code=303)
     rows = query_all(
-        """SELECT name, company, email, event_type, message, created_at
-           FROM enquiries WHERE event_id = ? ORDER BY created_at""",
-        (event_id,),
+        """SELECT e.name AS event_name, s.name, s.email, s.created_at, s.notified_at
+           FROM email_signups s
+           JOIN events e ON e.id = s.event_id
+           ORDER BY s.created_at DESC"""
+    )
+    return _csv_response(
+        rows, ["event_name", "name", "email", "created_at", "notified_at"], "signups.csv"
+    )
+
+
+@router.get("/enquiries", response_class=HTMLResponse)
+def all_enquiries(request: Request):
+    if not _is_logged_in(request):
+        return RedirectResponse("/admin/login", status_code=303)
+    rows = query_all(
+        """SELECT q.name, q.company, q.email, q.event_type, q.message, q.created_at,
+                  COALESCE(e.name, 'Unassigned') AS event_name
+           FROM enquiries q
+           LEFT JOIN events e ON e.id = q.event_id
+           ORDER BY q.created_at DESC"""
+    )
+    return templates.TemplateResponse("admin/enquiries.html", {"request": request, "enquiries": rows})
+
+
+@router.get("/enquiries.csv")
+def export_all_enquiries_csv(request: Request):
+    if not _is_logged_in(request):
+        return RedirectResponse("/admin/login", status_code=303)
+    rows = query_all(
+        """SELECT COALESCE(e.name, 'Unassigned') AS event_name, q.name, q.company, q.email,
+                  q.event_type, q.message, q.created_at
+           FROM enquiries q
+           LEFT JOIN events e ON e.id = q.event_id
+           ORDER BY q.created_at DESC"""
     )
     return _csv_response(
         rows,
-        ["name", "company", "email", "event_type", "message", "created_at"],
-        f"enquiries_event_{event_id}.csv",
+        ["event_name", "name", "company", "email", "event_type", "message", "created_at"],
+        "enquiries.csv",
     )

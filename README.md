@@ -24,9 +24,10 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Per-event landing pages served at `/e/{slug}` — unlimited events from a single deployment
 - Email-capture form while photos are processing; auto-swaps to a gallery link when status flips to `photos_ready`
 - Targeted photo-ready email blast to signed-up attendees (Resend, Postmark, SMTP, or stdout/none for local dev)
-- Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload (manual or auto-pulled from the gallery's preview image), CSV export of signups
+- Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload (manual or auto-pulled from the gallery's preview image)
+- Unified signups/enquiries views in admin — every event's data in one sortable table each, with an event-name column ("Unassigned" for enquiries submitted from the homepage), each with its own CSV export
 - Gallery password shown with a copy-to-clipboard button on the public page and included in the "photos ready" notification email
-- "Past events" showcase on the homepage — any event with a thumbnail set appears there, linking to its public page
+- Homepage leads with a swipeable carousel — latest event first, then up to 7 past events with thumbnails, arrow-navigable; visitors click in themselves, no auto-redirect
 - IP rate limiting on signup and enquiry endpoints
 - Auto-applies DB schema on startup — no manual migration step needed
 - Server-rendered Jinja2 templates, no frontend build step

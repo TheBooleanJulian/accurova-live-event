@@ -23,17 +23,32 @@
   <hr class="hairline" />
 
   {% if latest_event %}
-  <a class="latest-event-card" href="/e/{{ latest_event.slug }}">
-    {% if latest_event.thumbnail_path %}
-    <img src="{{ latest_event.thumbnail_path }}" alt="{{ latest_event.name }}" class="latest-event-thumb" />
-    {% endif %}
-    <div class="latest-event-body">
-      <p class="section-title" style="margin:0 0 4px;">Latest event</p>
-      <p class="card-title" style="margin:0 0 2px;">{{ latest_event.name }}</p>
-      {% if latest_event.event_date %}<p class="card-desc" style="margin:0;">{{ latest_event.event_date }}</p>{% endif %}
-      <span class="latest-event-cta">View event page &rarr;</span>
+  <div class="event-carousel-wrap">
+    <div class="event-carousel" id="event-carousel">
+      <a class="carousel-card" href="/e/{{ latest_event.slug }}">
+        {% if latest_event.thumbnail_path %}
+        <img src="{{ latest_event.thumbnail_path }}" alt="{{ latest_event.name }}" class="carousel-card-thumb" />
+        {% endif %}
+        <div class="carousel-card-body">
+          <p class="section-title" style="margin:0 0 4px;">Latest event</p>
+          <p class="card-title" style="margin:0 0 2px;">{{ latest_event.name }}</p>
+          {% if latest_event.event_date %}<p class="card-desc" style="margin:0;">{{ latest_event.event_date }}</p>{% endif %}
+        </div>
+      </a>
+      {% for e in past_events %}
+      <a class="carousel-card" href="/e/{{ e.slug }}">
+        <img src="{{ e.thumbnail_path }}" alt="{{ e.name }}" class="carousel-card-thumb" loading="lazy" />
+        <div class="carousel-card-body">
+          <p class="card-title" style="margin:0;">{{ e.name }}</p>
+        </div>
+      </a>
+      {% endfor %}
     </div>
-  </a>
+    {% if past_events %}
+    <button type="button" class="carousel-arrow carousel-arrow-prev" id="carousel-prev" aria-label="Previous">&larr;</button>
+    <button type="button" class="carousel-arrow carousel-arrow-next" id="carousel-next" aria-label="Next">&rarr;</button>
+    {% endif %}
+  </div>
   {% endif %}
 
   <div class="card card-primary">
@@ -86,19 +101,6 @@
     <div id="enquiry-status" class="status-msg"></div>
   </div>
 
-  {% if past_events %}
-  <hr class="hairline" />
-  <p class="section-title">Past events</p>
-  <div class="past-events-grid">
-    {% for e in past_events %}
-    <a class="past-event-tile" href="/e/{{ e.slug }}">
-      <img src="{{ e.thumbnail_path }}" alt="{{ e.name }}" loading="lazy" />
-      <span class="past-event-name">{{ e.name }}</span>
-    </a>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <footer>ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA</footer>
 </div>
 
@@ -142,6 +144,20 @@ enquiryForm.addEventListener('submit', async (e) => {
     btn.disabled = false;
   }
 });
+
+const carousel = document.getElementById('event-carousel');
+const carouselPrev = document.getElementById('carousel-prev');
+const carouselNext = document.getElementById('carousel-next');
+if (carousel && carouselPrev && carouselNext) {
+  const scrollByCard = (dir) => {
+    const card = carousel.querySelector('.carousel-card');
+    if (!card) return;
+    const gap = parseFloat(getComputedStyle(carousel).columnGap || getComputedStyle(carousel).gap || '0');
+    carousel.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: 'smooth' });
+  };
+  carouselPrev.addEventListener('click', () => scrollByCard(-1));
+  carouselNext.addEventListener('click', () => scrollByCard(1));
+}
 </script>
 </body>
 </html>
