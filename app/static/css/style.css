@@ -1,16 +1,17 @@
-/* Accurova design system — deep void / teal / gold, editorial-premium, mobile-first */
+/* Accurova design system — light, editorial-premium, mobile-first */
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --void: #050508;
-  --void-2: #0a0e14;
-  --teal: #00d4c8;
-  --gold: #f5c842;
-  --ink: #f5f5f5;
-  --ink-dim: #a7adb8;
-  --ink-faint: #6b7280;
-  --hairline: rgba(255, 255, 255, 0.1);
+  --bg: #ffffff;
+  --bg-2: #f6f7f8;
+  --teal: #00a89e;
+  --teal-ink: #00655f;
+  --gold: #b9860a;
+  --ink: #0b0d12;
+  --ink-dim: #4b5563;
+  --ink-faint: #8a8f98;
+  --hairline: rgba(10, 14, 20, 0.1);
   --font-head: 'Space Grotesk', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -21,21 +22,32 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--void);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: radial-gradient(circle at 50% 0%, var(--void-2) 0%, var(--void) 60%);
+  background: radial-gradient(circle at 50% 0%, var(--bg-2) 0%, var(--bg) 60%);
   min-height: 100vh;
 }
 
 .wrap {
   max-width: 480px;
   margin: 0 auto;
-  padding: 28px 20px 60px;
+  padding: 24px 20px 60px;
+}
+
+.brand-header {
+  margin: 0 0 4px;
+}
+
+.brand-logo {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
 }
 
 .eyebrow {
@@ -43,7 +55,7 @@ body {
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--teal-ink);
   margin: 0 0 8px;
 }
 
@@ -54,7 +66,7 @@ body {
   letter-spacing: 0.02em;
   margin: 0;
 }
-.brand span { color: var(--teal); }
+.brand span { color: var(--teal-ink); }
 
 .badge-row {
   display: flex;
@@ -75,7 +87,7 @@ body {
 .hairline {
   border: none;
   border-top: 1px solid var(--hairline);
-  margin: 24px 0;
+  margin: 20px 0;
 }
 
 h1.event-name {
@@ -94,15 +106,16 @@ h1.event-name {
 
 .card {
   border: 1px solid var(--hairline);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 20px;
   margin-bottom: 14px;
-  background: rgba(255, 255, 255, 0.015);
+  background: var(--bg);
+  box-shadow: 0 1px 2px rgba(10, 14, 20, 0.04);
 }
 
 .card-primary {
-  border-color: rgba(0, 212, 200, 0.35);
-  background: rgba(0, 212, 200, 0.04);
+  border-color: rgba(0, 168, 158, 0.35);
+  background: rgba(0, 168, 158, 0.05);
 }
 
 .card-title {
@@ -127,16 +140,17 @@ h1.event-name {
   font-weight: 500;
   font-size: 15px;
   padding: 15px 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   text-decoration: none;
   border: none;
   cursor: pointer;
   letter-spacing: 0.01em;
+  min-height: 48px;
 }
 
 .btn-primary {
   background: var(--teal);
-  color: var(--void);
+  color: #ffffff;
 }
 .btn-primary:active { opacity: 0.85; }
 
@@ -149,7 +163,7 @@ h1.event-name {
 
 .btn-gold {
   background: var(--gold);
-  color: var(--void);
+  color: #ffffff;
 }
 
 input[type="email"],
@@ -157,9 +171,9 @@ input[type="text"],
 select,
 textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-2);
   border: 1px solid var(--hairline);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--ink);
   padding: 13px 14px;
   font-family: var(--font-body);
@@ -188,8 +202,8 @@ textarea { resize: vertical; min-height: 80px; }
   display: none;
 }
 .status-msg.show { display: block; }
-.status-msg.ok { background: rgba(0, 212, 200, 0.1); color: var(--teal); }
-.status-msg.err { background: rgba(245, 100, 100, 0.1); color: #f56464; }
+.status-msg.ok { background: rgba(0, 168, 158, 0.1); color: var(--teal-ink); }
+.status-msg.err { background: rgba(200, 60, 60, 0.1); color: #c83c3c; }
 
 footer {
   text-align: center;
@@ -204,7 +218,7 @@ footer {
 .admin-wrap {
   max-width: 880px;
   margin: 0 auto;
-  padding: 28px 20px 60px;
+  padding: 24px 20px 60px;
 }
 table {
   width: 100%;
@@ -231,12 +245,12 @@ th {
   border-radius: 10px;
   letter-spacing: 0.04em;
 }
-.status-upcoming { background: rgba(167,173,184,0.15); color: var(--ink-dim); }
-.status-live { background: rgba(245,200,66,0.15); color: var(--gold); }
-.status-photos_ready { background: rgba(0,212,200,0.15); color: var(--teal); }
+.status-upcoming { background: rgba(75,85,99,0.1); color: var(--ink-dim); }
+.status-live { background: rgba(185,134,10,0.12); color: var(--gold); }
+.status-photos_ready { background: rgba(0,168,158,0.12); color: var(--teal-ink); }
 
 .row-actions a {
-  color: var(--teal);
+  color: var(--teal-ink);
   font-family: var(--font-mono);
   font-size: 11px;
   text-decoration: none;
@@ -247,6 +261,7 @@ th {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 12px;
 }
 .link-btn {
   font-family: var(--font-mono);
@@ -256,4 +271,17 @@ th {
   border: 1px solid var(--hairline);
   padding: 6px 12px;
   border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* --- Mobile-friendly tables (admin dashboard/event detail on small screens) --- */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 14px;
+}
+.table-scroll table { margin-top: 0; min-width: 480px; }
+
+@media (max-width: 640px) {
+  .admin-wrap { padding: 20px 14px 48px; }
 }

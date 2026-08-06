@@ -10,8 +10,8 @@
 <div class="admin-wrap">
   <div class="top-bar">
     <div>
-      <p class="eyebrow">Accurova / Admin</p>
-      <p class="brand">Events</p>
+      <img src="/static/img/accurova-banner.png" alt="Accurova" class="brand-logo" style="max-width:150px;" />
+      <p class="eyebrow" style="margin-top:8px;">Admin / Events</p>
     </div>
     <a class="link-btn" href="/admin/logout">Log out</a>
   </div>
@@ -30,6 +30,7 @@
 
   <div class="card">
     <p class="card-title">All events</p>
+    <div class="table-scroll">
     <table>
       <thead>
         <tr>
@@ -57,6 +58,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 </body>
