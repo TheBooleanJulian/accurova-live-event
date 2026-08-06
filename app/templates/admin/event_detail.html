@@ -28,6 +28,7 @@
       <input type="text" name="client_name" value="{{ event.client_name or '' }}" placeholder="Client name" />
       <input type="text" name="event_date" value="{{ event.event_date or '' }}" placeholder="Event date (YYYY-MM-DD)" />
       <input type="text" name="gallery_url" value="{{ event.gallery_url or '' }}" placeholder="LuxSync gallery URL" />
+      <input type="text" name="gallery_password" value="{{ event.gallery_password or '' }}" placeholder="Gallery password (optional)" />
       <label class="form-note" style="display:block; margin-bottom:6px;">Slug — public page is at /e/{{ event.slug }}</label>
       <input type="text" name="slug" value="{{ event.slug }}" placeholder="event-slug" />
       <select name="status">

@@ -67,7 +67,12 @@ def send_email(to_email: str, subject: str, html: str) -> bool:
     return True
 
 
-def photos_ready_email_html(event_name: str, gallery_url: str) -> str:
+def photos_ready_email_html(event_name: str, gallery_url: str, gallery_password: str | None = None) -> str:
+    password_block = ""
+    if gallery_password:
+        password_block = f"""
+      <p style="color:#cfd3da; margin:0 0 24px;">Gallery password: <strong style="font-family: monospace;">{gallery_password}</strong></p>
+        """
     return f"""
     <div style="font-family: Arial, sans-serif; background:#050508; color:#f5f5f5; padding:32px;">
       <h2 style="color:#00D4C8; margin-bottom:8px;">Your photos are ready</h2>
@@ -77,6 +82,7 @@ def photos_ready_email_html(event_name: str, gallery_url: str) -> str:
           View &amp; Download Photos
         </a>
       </p>
+      {password_block}
       <p style="color:#8a8f98; font-size:12px;">Sent by Accurova &mdash; premium photography &amp; digital media.</p>
     </div>
     """

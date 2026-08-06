@@ -175,6 +175,7 @@ def update_event(
     client_name: str = Form(""),
     event_date: str = Form(""),
     gallery_url: str = Form(""),
+    gallery_password: str = Form(""),
     slug: str = Form(""),
     status: str = Form("upcoming"),
     remove_thumbnail: str = Form(""),
@@ -189,6 +190,7 @@ def update_event(
 
     was_photos_ready = event["status"] == "photos_ready"
     gallery_url = gallery_url.strip() or None
+    gallery_password = gallery_password.strip() or None
 
     slug = _slugify(slug) if slug.strip() else event["slug"]
     slug = _unique_slug(slug, exclude_event_id=event_id)
@@ -210,12 +212,13 @@ def update_event(
     with db_cursor() as cur:
         cur.execute(
             """UPDATE events SET name = ?, client_name = ?, event_date = ?, gallery_url = ?,
-               slug = ?, status = ?, thumbnail_path = ? WHERE id = ?""",
+               gallery_password = ?, slug = ?, status = ?, thumbnail_path = ? WHERE id = ?""",
             (
                 name.strip(),
                 client_name.strip() or None,
                 event_date.strip() or None,
                 gallery_url,
+                gallery_password,
                 slug,
                 status,
                 thumbnail_path,
@@ -236,7 +239,7 @@ def update_event(
                 sent = send_email(
                     s["email"],
                     f"Your photos from {name.strip()} are ready",
-                    photos_ready_email_html(name.strip(), gallery_url),
+                    photos_ready_email_html(name.strip(), gallery_url, gallery_password),
                 )
                 if sent:
                     with db_cursor() as cur:
