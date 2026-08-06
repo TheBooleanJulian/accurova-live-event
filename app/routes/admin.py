@@ -2,7 +2,9 @@ import csv
 import io
 import re
 from pathlib import Path
+from urllib.parse import urljoin, quote
 
+import httpx
 from fastapi import APIRouter, Request, Form, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
@@ -51,15 +53,61 @@ THUMBNAIL_CONTENT_TYPES = {
 }
 
 
-def _save_thumbnail(event_id: int, upload: UploadFile, data: bytes) -> str:
-    """Writes the uploaded thumbnail to UPLOADS_DIR and returns its public web path.
-    Filename is derived from event_id (not the client-supplied name) so there's no
+def _save_thumbnail(event_id: int, content_type: str, data: bytes) -> str:
+    """Writes a thumbnail to UPLOADS_DIR and returns its public web path. Filename is
+    derived from event_id (not any client/remote-supplied name) so there's no
     path-traversal surface, and any previous thumbnail for this event is overwritten."""
-    ext = THUMBNAIL_CONTENT_TYPES[upload.content_type]
+    ext = THUMBNAIL_CONTENT_TYPES[content_type]
     settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
     dest = settings.UPLOADS_DIR / f"event_{event_id}{ext}"
     dest.write_bytes(data)
     return f"/uploads/event_{event_id}{ext}"
+
+
+OG_IMAGE_RE = re.compile(
+    r'<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)["\']',
+    re.IGNORECASE,
+)
+OG_IMAGE_RE_ALT = re.compile(
+    r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\']',
+    re.IGNORECASE,
+)
+
+
+def _extract_preview_image_url(html: str) -> str | None:
+    match = OG_IMAGE_RE.search(html) or OG_IMAGE_RE_ALT.search(html)
+    return match.group(1) if match else None
+
+
+def _fetch_gallery_thumbnail(event_id: int, gallery_url: str) -> str:
+    """Fetches the gallery page, pulls its og:image/twitter:image preview, downloads
+    it, and saves it as this event's thumbnail. Raises ValueError with a
+    user-facing message on any failure (no preview tag, unsupported type, too big)."""
+    with httpx.Client(timeout=10, follow_redirects=True) as client:
+        try:
+            page_resp = client.get(gallery_url)
+            page_resp.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise ValueError(f"Couldn't reach the gallery URL ({exc}).") from exc
+
+        image_url = _extract_preview_image_url(page_resp.text)
+        if not image_url:
+            raise ValueError("No preview image found on that gallery page.")
+        image_url = urljoin(str(page_resp.url), image_url)
+
+        try:
+            img_resp = client.get(image_url)
+            img_resp.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise ValueError(f"Couldn't download the gallery preview image ({exc}).") from exc
+
+    content_type = img_resp.headers.get("content-type", "").split(";")[0].strip()
+    if content_type not in THUMBNAIL_CONTENT_TYPES:
+        raise ValueError(f"Gallery preview image type ({content_type or 'unknown'}) isn't supported.")
+    if len(img_resp.content) > THUMBNAIL_MAX_BYTES:
+        raise ValueError("Gallery preview image is too large.")
+
+    return _save_thumbnail(event_id, content_type, img_resp.content)
 
 
 # --- Auth ---
@@ -140,7 +188,7 @@ def create_event(
 # --- Event detail / edit ---
 
 @router.get("/events/{event_id}", response_class=HTMLResponse)
-def event_detail(request: Request, event_id: int, message: str = ""):
+def event_detail(request: Request, event_id: int, message: str = "", error: str = ""):
     if not _is_logged_in(request):
         return RedirectResponse("/admin/login", status_code=303)
 
@@ -163,6 +211,7 @@ def event_detail(request: Request, event_id: int, message: str = ""):
             "signups": signups,
             "enquiries": enquiries,
             "message": message,
+            "error": error,
         },
     )
 
@@ -202,7 +251,7 @@ def update_event(
         data = thumbnail.file.read(THUMBNAIL_MAX_BYTES + 1)
         if len(data) > THUMBNAIL_MAX_BYTES:
             raise HTTPException(status_code=400, detail="Thumbnail must be 25MB or smaller.")
-        thumbnail_path = _save_thumbnail(event_id, thumbnail, data)
+        thumbnail_path = _save_thumbnail(event_id, thumbnail.content_type, data)
     elif remove_thumbnail == "on":
         if thumbnail_path:
             old = settings.UPLOADS_DIR / Path(thumbnail_path).name
@@ -252,7 +301,32 @@ def update_event(
                 print(f"[admin] failed to notify {s['email']}: {exc}")
         message = f"Event updated. Notified {sent_count}/{len(signups)} signups."
 
-    return RedirectResponse(f"/admin/events/{event_id}?message={message}", status_code=303)
+    return RedirectResponse(f"/admin/events/{event_id}?message={quote(message)}", status_code=303)
+
+
+@router.post("/events/{event_id}/fetch-thumbnail")
+def fetch_thumbnail(request: Request, event_id: int):
+    if not _is_logged_in(request):
+        return RedirectResponse("/admin/login", status_code=303)
+
+    event = query_one("SELECT * FROM events WHERE id = ?", (event_id,))
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    if not event["gallery_url"]:
+        return RedirectResponse(
+            f"/admin/events/{event_id}?error={quote('Set and save a gallery URL first.')}", status_code=303
+        )
+
+    try:
+        thumbnail_path = _fetch_gallery_thumbnail(event_id, event["gallery_url"])
+        with db_cursor() as cur:
+            cur.execute("UPDATE events SET thumbnail_path = ? WHERE id = ?", (thumbnail_path, event_id))
+        return RedirectResponse(
+            f"/admin/events/{event_id}?message={quote('Thumbnail pulled from the gallery.')}", status_code=303
+        )
+    except ValueError as exc:
+        return RedirectResponse(f"/admin/events/{event_id}?error={quote(str(exc))}", status_code=303)
 
 
 @router.post("/events/{event_id}/delete")

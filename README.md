@@ -24,7 +24,7 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Per-event landing pages served at `/e/{slug}` — unlimited events from a single deployment
 - Email-capture form while photos are processing; auto-swaps to a gallery link when status flips to `photos_ready`
 - Targeted photo-ready email blast to signed-up attendees (Resend, Postmark, SMTP, or stdout/none for local dev)
-- Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload, CSV export of signups
+- Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload (manual or auto-pulled from the gallery's preview image), CSV export of signups
 - Gallery password shown with a copy-to-clipboard button on the public page and included in the "photos ready" notification email
 - "Past events" showcase on the homepage — any event with a thumbnail set appears there, linking to its public page
 - IP rate limiting on signup and enquiry endpoints
