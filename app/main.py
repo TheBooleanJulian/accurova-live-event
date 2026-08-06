@@ -13,16 +13,19 @@ app = FastAPI(title="Accurova Live Event", docs_url=None, redoc_url=None)
 
 
 @app.middleware("http")
-async def _no_store_admin(request: Request, call_next):
+async def _no_store_dynamic(request: Request, call_next):
     """
-    /admin/* responses carry a session-gated dashboard and PII (signups,
-    enquiries) — an intermediate CDN (e.g. Cloudflare in front of Zeabur)
-    must never cache them, or an unauthenticated visitor can be served a
-    stale, already-authenticated response straight from cache, bypassing
-    the app's own login check entirely.
+    Every route here is server-rendered from live DB state (event status,
+    admin session data, signups/enquiries) — an intermediate CDN (e.g.
+    Cloudflare in front of Zeabur) must never cache these responses.
+    Confirmed live: Cloudflare cached "/" for 4h and kept serving a stale
+    homepage after a redeploy, and separately cached an authenticated
+    /admin dashboard and served it to unauthenticated visitors. Only the
+    genuinely static /static and /uploads assets are exempt.
     """
     response = await call_next(request)
-    if request.url.path.startswith("/admin"):
+    path = request.url.path
+    if not (path.startswith("/static") or path.startswith("/uploads")):
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
         response.headers["Pragma"] = "no-cache"
     return response
