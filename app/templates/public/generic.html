@@ -37,6 +37,19 @@
     <a class="btn btn-outline" href="{{ portfolio_url }}" target="_blank" rel="noopener">View Portfolio</a>
   </div>
 
+  {% if past_events %}
+  <hr class="hairline" />
+  <p class="section-title">Past events</p>
+  <div class="past-events-grid">
+    {% for e in past_events %}
+    <a class="past-event-tile" href="/e/{{ e.slug }}">
+      <img src="{{ e.thumbnail_path }}" alt="{{ e.name }}" loading="lazy" />
+      <span class="past-event-name">{{ e.name }}</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <footer>ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA</footer>
 </div>
 </body>

@@ -205,6 +205,44 @@ textarea { resize: vertical; min-height: 80px; }
 .status-msg.ok { background: rgba(0, 168, 158, 0.1); color: var(--teal-ink); }
 .status-msg.err { background: rgba(200, 60, 60, 0.1); color: #c83c3c; }
 
+.section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 12px;
+}
+
+.past-events-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.past-event-tile {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.past-event-tile img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.past-event-name {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 10px;
+  line-height: 1.3;
+}
+
 footer {
   text-align: center;
   margin-top: 32px;

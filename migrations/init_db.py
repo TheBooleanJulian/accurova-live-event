@@ -26,12 +26,22 @@ if not DB_PATH.is_absolute():
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
 
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str, coltype: str) -> None:
+    """CREATE TABLE ... IF NOT EXISTS never alters an existing table, so a column
+    added to schema.sql after the table already exists on a deployed DB needs an
+    explicit, idempotent ALTER TABLE here."""
+    existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+    if column not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {coltype}")
+
+
 def init_db(db_path: Path = DB_PATH) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     sql = SCHEMA_PATH.read_text()
     conn = sqlite3.connect(db_path)
     try:
         conn.executescript(sql)
+        _add_column_if_missing(conn, "events", "thumbnail_path", "TEXT")
         conn.commit()
     finally:
         conn.close()

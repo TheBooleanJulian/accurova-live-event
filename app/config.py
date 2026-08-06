@@ -17,6 +17,7 @@ def _resolve_path(value: str) -> Path:
 
 class Settings:
     DB_PATH: Path = _resolve_path(os.environ.get("DB_PATH", "./data/live_event.db"))
+    UPLOADS_DIR: Path = _resolve_path(os.environ.get("UPLOADS_DIR", "./data/uploads"))
     SESSION_SECRET: str = os.environ.get("SESSION_SECRET", "dev-insecure-secret-change-me")
     ADMIN_PASSWORD: str = os.environ.get("ADMIN_PASSWORD", "changeme")
     PUBLIC_BASE_URL: str = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")

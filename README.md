@@ -24,7 +24,8 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Per-event landing pages served at `/e/{slug}` — unlimited events from a single deployment
 - Email-capture form while photos are processing; auto-swaps to a gallery link when status flips to `photos_ready`
 - Targeted photo-ready email blast to signed-up attendees (Resend, Postmark, SMTP, or stdout/none for local dev)
-- Admin dashboard: event CRUD, status management, gallery URL, CSV export of signups
+- Admin dashboard: event CRUD, status management, gallery URL, thumbnail upload, CSV export of signups
+- "Past events" showcase on the homepage — any event with a thumbnail set appears there, linking to its public page
 - IP rate limiting on signup and enquiry endpoints
 - Auto-applies DB schema on startup — no manual migration step needed
 - Server-rendered Jinja2 templates, no frontend build step
@@ -61,6 +62,7 @@ Visit `http://localhost:8000/admin`, log in with `ADMIN_PASSWORD`, create an eve
 | `SESSION_SECRET` | Yes | Signs the admin session cookie — generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `ADMIN_PASSWORD` | Yes | Single-operator admin password |
 | `DB_PATH` | Yes | Path to the SQLite file (e.g. `./data/live_event.db`) |
+| `UPLOADS_DIR` | No | Directory for uploaded event thumbnails, served at `/uploads/*` (default: `./data/uploads`) |
 | `PUBLIC_BASE_URL` | Yes | Base URL of the deployment |
 | `WHATSAPP_NUMBER` | No | Full international number for `wa.me` links, e.g. `6580001234` or `+6580001234` |
 | `LINKEDIN_URL` / `PORTFOLIO_URL` | No | Outbound links shown on the public event page |
@@ -100,6 +102,8 @@ requirements.txt
 ## Deployment
 
 Deployed on Zeabur via GitHub CI/CD. Push to `main` triggers deploy. Branch flow: `feature → dev → main`.
+
+Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/data`) — without it, every redeploy wipes events, signups, enquiries, and uploaded thumbnails.
 
 ## Status / Roadmap
 

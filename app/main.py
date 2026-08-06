@@ -7,7 +7,7 @@ from migrations.init_db import init_db
 from app.routes import public, admin
 from app.routes.public import whatsapp_link
 from app.config import settings
-from app.db import query_one
+from app.db import query_all, query_one
 
 app = FastAPI(title="Accurova Live Event", docs_url=None, redoc_url=None)
 
@@ -23,7 +23,10 @@ def _apply_schema() -> None:
 
 templates = Jinja2Templates(directory="app/templates")
 
+settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/uploads", StaticFiles(directory=settings.UPLOADS_DIR), name="uploads")
 
 app.include_router(public.router)
 app.include_router(admin.router)
@@ -45,6 +48,12 @@ def root(request: Request):
     if live_count and live_count["c"] == 1 and live_events:
         return RedirectResponse(f"/e/{live_events['slug']}", status_code=303)
 
+    past_events = query_all(
+        """SELECT slug, name, event_date, thumbnail_path FROM events
+           WHERE thumbnail_path IS NOT NULL
+           ORDER BY COALESCE(event_date, created_at) DESC LIMIT 7"""
+    )
+
     return templates.TemplateResponse(
         "public/generic.html",
         {
@@ -52,6 +61,7 @@ def root(request: Request):
             "whatsapp_link": whatsapp_link("Hi Accurova, I'd like to enquire about photography for my event."),
             "linkedin_url": settings.LINKEDIN_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
+            "past_events": past_events,
         },
     )
 
