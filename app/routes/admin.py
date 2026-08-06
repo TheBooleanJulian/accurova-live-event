@@ -41,7 +41,7 @@ def _is_logged_in(request: Request) -> bool:
     return verify_session_token(request.cookies.get(SESSION_COOKIE_NAME))
 
 
-THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+THUMBNAIL_MAX_BYTES = 25 * 1024 * 1024  # 25 MB
 THUMBNAIL_CONTENT_TYPES = {
     "image/jpeg": ".jpg",
     "image/png": ".png",
@@ -193,7 +193,7 @@ def update_event(
             raise HTTPException(status_code=400, detail="Thumbnail must be a JPEG, PNG, or WebP image.")
         data = thumbnail.file.read(THUMBNAIL_MAX_BYTES + 1)
         if len(data) > THUMBNAIL_MAX_BYTES:
-            raise HTTPException(status_code=400, detail="Thumbnail must be 5MB or smaller.")
+            raise HTTPException(status_code=400, detail="Thumbnail must be 25MB or smaller.")
         thumbnail_path = _save_thumbnail(event_id, thumbnail, data)
     elif remove_thumbnail == "on":
         if thumbnail_path:
