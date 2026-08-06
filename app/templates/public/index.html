@@ -36,6 +36,7 @@
     <p class="card-title">Get today's event photos</p>
     <p class="card-desc">Photos are still being processed. Leave your email and we'll notify you the moment they're ready.</p>
     <form id="signup-form">
+      <input type="text" id="signup-name" name="name" placeholder="Your name" required autocomplete="name" />
       <input type="email" id="signup-email" name="email" placeholder="you@company.com" required autocomplete="email" />
       <button type="submit" class="btn btn-primary">Notify Me</button>
     </form>
@@ -107,6 +108,7 @@ if (signupForm) {
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const statusEl = document.getElementById('signup-status');
+    const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const btn = signupForm.querySelector('button');
     btn.disabled = true;
@@ -114,7 +116,7 @@ if (signupForm) {
       const res = await fetch(`/e/${EVENT_SLUG}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ name, email }),
       });
       const data = await res.json();
       if (res.ok) {
