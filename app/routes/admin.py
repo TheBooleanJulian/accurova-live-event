@@ -28,13 +28,15 @@ def _slugify(value: str) -> str:
     return value or "event"
 
 
-def _unique_slug(base: str) -> str:
+def _unique_slug(base: str, exclude_event_id: int | None = None) -> str:
     slug = base
     n = 2
-    while query_one("SELECT id FROM events WHERE slug = ?", (slug,)):
+    while True:
+        row = query_one("SELECT id FROM events WHERE slug = ?", (slug,))
+        if not row or row["id"] == exclude_event_id:
+            return slug
         slug = f"{base}-{n}"
         n += 1
-    return slug
 
 
 def _is_logged_in(request: Request) -> bool:
@@ -173,6 +175,7 @@ def update_event(
     client_name: str = Form(""),
     event_date: str = Form(""),
     gallery_url: str = Form(""),
+    slug: str = Form(""),
     status: str = Form("upcoming"),
     remove_thumbnail: str = Form(""),
     thumbnail: UploadFile | None = File(None),
@@ -186,6 +189,9 @@ def update_event(
 
     was_photos_ready = event["status"] == "photos_ready"
     gallery_url = gallery_url.strip() or None
+
+    slug = _slugify(slug) if slug.strip() else event["slug"]
+    slug = _unique_slug(slug, exclude_event_id=event_id)
 
     thumbnail_path = event["thumbnail_path"]
     if thumbnail is not None and thumbnail.filename:
@@ -204,12 +210,13 @@ def update_event(
     with db_cursor() as cur:
         cur.execute(
             """UPDATE events SET name = ?, client_name = ?, event_date = ?, gallery_url = ?,
-               status = ?, thumbnail_path = ? WHERE id = ?""",
+               slug = ?, status = ?, thumbnail_path = ? WHERE id = ?""",
             (
                 name.strip(),
                 client_name.strip() or None,
                 event_date.strip() or None,
                 gallery_url,
+                slug,
                 status,
                 thumbnail_path,
                 event_id,
@@ -243,6 +250,24 @@ def update_event(
         message = f"Event updated. Notified {sent_count}/{len(signups)} signups."
 
     return RedirectResponse(f"/admin/events/{event_id}?message={message}", status_code=303)
+
+
+@router.post("/events/{event_id}/delete")
+def delete_event(request: Request, event_id: int):
+    if not _is_logged_in(request):
+        return RedirectResponse("/admin/login", status_code=303)
+
+    event = query_one("SELECT * FROM events WHERE id = ?", (event_id,))
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    if event["thumbnail_path"]:
+        (settings.UPLOADS_DIR / Path(event["thumbnail_path"]).name).unlink(missing_ok=True)
+
+    with db_cursor() as cur:
+        cur.execute("DELETE FROM events WHERE id = ?", (event_id,))
+
+    return RedirectResponse("/admin", status_code=303)
 
 
 # --- CSV exports ---

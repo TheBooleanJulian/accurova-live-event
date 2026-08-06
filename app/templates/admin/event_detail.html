@@ -28,6 +28,8 @@
       <input type="text" name="client_name" value="{{ event.client_name or '' }}" placeholder="Client name" />
       <input type="text" name="event_date" value="{{ event.event_date or '' }}" placeholder="Event date (YYYY-MM-DD)" />
       <input type="text" name="gallery_url" value="{{ event.gallery_url or '' }}" placeholder="LuxSync gallery URL" />
+      <label class="form-note" style="display:block; margin-bottom:6px;">Slug — public page is at /e/{{ event.slug }}</label>
+      <input type="text" name="slug" value="{{ event.slug }}" placeholder="event-slug" />
       <select name="status">
         <option value="upcoming" {% if event.status == "upcoming" %}selected{% endif %}>upcoming</option>
         <option value="live" {% if event.status == "live" %}selected{% endif %}>live</option>
@@ -83,6 +85,14 @@
       </tbody>
     </table>
     </div>
+  </div>
+
+  <div class="card" style="border-color: rgba(200,60,60,0.35); background: rgba(200,60,60,0.04);">
+    <p class="card-title">Delete event</p>
+    <p class="card-desc">Permanently deletes this event, its thumbnail, and all email signups. Enquiries are kept but unlinked from this event. This cannot be undone.</p>
+    <form method="post" action="/admin/events/{{ event.id }}/delete" onsubmit="return confirm('Delete ' + {{ event.name|tojson }} + '? This cannot be undone.');">
+      <button type="submit" class="btn" style="background:#c83c3c; color:#fff;">Delete Event</button>
+    </form>
   </div>
 </div>
 </body>
