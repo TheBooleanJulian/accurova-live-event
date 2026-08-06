@@ -39,6 +39,18 @@ body {
   padding: 24px 20px 60px;
 }
 
+.site-title {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+.site-title:hover, .site-title:active { color: var(--teal-ink); }
+
 .brand-header {
   margin: 0 0 4px;
 }
