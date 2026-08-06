@@ -10,8 +10,8 @@
 <div class="admin-wrap">
   <div class="top-bar">
     <div>
-      <p class="eyebrow">Accurova / Admin</p>
-      <p class="brand">{{ event.name }}</p>
+      <img src="/static/img/accurova-banner.png" alt="Accurova" class="brand-logo" style="max-width:150px;" />
+      <p class="eyebrow" style="margin-top:8px;">Admin / {{ event.name }}</p>
     </div>
     <a class="link-btn" href="/admin">&larr; All events</a>
   </div>
@@ -41,6 +41,7 @@
   <div class="card">
     <p class="card-title">Email signups ({{ signups|length }})</p>
     <a class="link-btn" href="/admin/events/{{ event.id }}/signups.csv">Export CSV</a>
+    <div class="table-scroll">
     <table>
       <thead><tr><th>Email</th><th>Signed up</th><th>Notified</th></tr></thead>
       <tbody>
@@ -51,11 +52,13 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 
   <div class="card">
     <p class="card-title">Enquiries ({{ enquiries|length }})</p>
     <a class="link-btn" href="/admin/events/{{ event.id }}/enquiries.csv">Export CSV</a>
+    <div class="table-scroll">
     <table>
       <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Type</th><th>Message</th><th>Date</th></tr></thead>
       <tbody>
@@ -69,6 +72,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 </body>
