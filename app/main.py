@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from migrations.init_db import init_db
@@ -54,18 +54,11 @@ app.include_router(admin.router)
 def root(request: Request):
     """
     Bare-domain visits (no event slug) must never land clients on the admin
-    login. If exactly one event is currently 'live', send visitors straight
-    there; otherwise show a generic branded page with WhatsApp/LinkedIn/
-    portfolio links so they can still reach the team. Operators use /admin
+    login, and must never auto-redirect into an event page either — visitors
+    land on a generic branded page and choose to click into an event
+    themselves via the latest-event/past-events cards. Operators use /admin
     directly — it's never linked from here.
     """
-    live_events = query_one(
-        "SELECT slug FROM events WHERE status = 'live' ORDER BY created_at DESC LIMIT 2"
-    )
-    live_count = query_one("SELECT COUNT(*) AS c FROM events WHERE status = 'live'")
-    if live_count and live_count["c"] == 1 and live_events:
-        return RedirectResponse(f"/e/{live_events['slug']}", status_code=303)
-
     latest_event = query_one(
         "SELECT id, slug, name, event_date, thumbnail_path FROM events ORDER BY COALESCE(event_date, created_at) DESC LIMIT 1"
     )

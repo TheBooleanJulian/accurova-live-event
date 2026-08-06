@@ -262,32 +262,6 @@ textarea { resize: vertical; min-height: 80px; }
 .status-msg.ok { background: rgba(0, 168, 158, 0.1); color: var(--teal-ink); }
 .status-msg.err { background: rgba(200, 60, 60, 0.1); color: #c83c3c; }
 
-.latest-event-card {
-  display: block;
-  text-decoration: none;
-  color: var(--ink);
-  border: 1px solid rgba(0, 168, 158, 0.35);
-  background: rgba(0, 168, 158, 0.05);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 14px;
-}
-.latest-event-thumb {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-}
-.latest-event-body { padding: 16px 20px; }
-.latest-event-cta {
-  display: inline-block;
-  margin-top: 8px;
-  font-family: var(--font-head);
-  font-weight: 500;
-  font-size: 13px;
-  color: var(--teal-ink);
-}
-
 .section-title {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -297,13 +271,23 @@ textarea { resize: vertical; min-height: 80px; }
   margin: 0 0 12px;
 }
 
-.past-events-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 8px;
+.event-carousel-wrap {
+  position: relative;
+  margin-bottom: 14px;
 }
-.past-event-tile {
+.event-carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.event-carousel::-webkit-scrollbar { display: none; }
+
+.carousel-card {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
   display: block;
   text-decoration: none;
   color: var(--ink);
@@ -312,19 +296,39 @@ textarea { resize: vertical; min-height: 80px; }
   overflow: hidden;
   background: var(--bg);
 }
-.past-event-tile img {
+.carousel-card:first-child {
+  border-color: rgba(0, 168, 158, 0.35);
+  background: rgba(0, 168, 158, 0.05);
+}
+.carousel-card-thumb {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   object-fit: cover;
 }
-.past-event-name {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 8px 10px;
-  line-height: 1.3;
+.carousel-card-body { padding: 14px 16px; }
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(10, 14, 20, 0.12);
 }
+.carousel-arrow:active { border-color: var(--teal); }
+.carousel-arrow-prev { left: 6px; }
+.carousel-arrow-next { right: 6px; }
 
 footer {
   text-align: center;
