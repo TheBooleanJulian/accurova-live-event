@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS events (
     client_name TEXT,
     event_date TEXT,                 -- ISO date string (YYYY-MM-DD)
     gallery_url TEXT,                -- nullable; set by admin once LuxSync gallery is ready
+    thumbnail_path TEXT,             -- nullable; web path to an uploaded thumbnail (e.g. /uploads/event_3.jpg)
     status TEXT NOT NULL DEFAULT 'upcoming'  -- upcoming | live | photos_ready
         CHECK (status IN ('upcoming', 'live', 'photos_ready')),
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

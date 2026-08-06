@@ -1,8 +1,9 @@
 import csv
 import io
 import re
+from pathlib import Path
 
-from fastapi import APIRouter, Request, Form, HTTPException
+from fastapi import APIRouter, Request, Form, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
@@ -38,6 +39,25 @@ def _unique_slug(base: str) -> str:
 
 def _is_logged_in(request: Request) -> bool:
     return verify_session_token(request.cookies.get(SESSION_COOKIE_NAME))
+
+
+THUMBNAIL_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
+THUMBNAIL_CONTENT_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+}
+
+
+def _save_thumbnail(event_id: int, upload: UploadFile, data: bytes) -> str:
+    """Writes the uploaded thumbnail to UPLOADS_DIR and returns its public web path.
+    Filename is derived from event_id (not the client-supplied name) so there's no
+    path-traversal surface, and any previous thumbnail for this event is overwritten."""
+    ext = THUMBNAIL_CONTENT_TYPES[upload.content_type]
+    settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    dest = settings.UPLOADS_DIR / f"event_{event_id}{ext}"
+    dest.write_bytes(data)
+    return f"/uploads/event_{event_id}{ext}"
 
 
 # --- Auth ---
@@ -154,6 +174,8 @@ def update_event(
     event_date: str = Form(""),
     gallery_url: str = Form(""),
     status: str = Form("upcoming"),
+    remove_thumbnail: str = Form(""),
+    thumbnail: UploadFile | None = File(None),
 ):
     if not _is_logged_in(request):
         return RedirectResponse("/admin/login", status_code=303)
@@ -165,11 +187,33 @@ def update_event(
     was_photos_ready = event["status"] == "photos_ready"
     gallery_url = gallery_url.strip() or None
 
+    thumbnail_path = event["thumbnail_path"]
+    if thumbnail is not None and thumbnail.filename:
+        if thumbnail.content_type not in THUMBNAIL_CONTENT_TYPES:
+            raise HTTPException(status_code=400, detail="Thumbnail must be a JPEG, PNG, or WebP image.")
+        data = thumbnail.file.read(THUMBNAIL_MAX_BYTES + 1)
+        if len(data) > THUMBNAIL_MAX_BYTES:
+            raise HTTPException(status_code=400, detail="Thumbnail must be 5MB or smaller.")
+        thumbnail_path = _save_thumbnail(event_id, thumbnail, data)
+    elif remove_thumbnail == "on":
+        if thumbnail_path:
+            old = settings.UPLOADS_DIR / Path(thumbnail_path).name
+            old.unlink(missing_ok=True)
+        thumbnail_path = None
+
     with db_cursor() as cur:
         cur.execute(
-            """UPDATE events SET name = ?, client_name = ?, event_date = ?, gallery_url = ?, status = ?
-               WHERE id = ?""",
-            (name.strip(), client_name.strip() or None, event_date.strip() or None, gallery_url, status, event_id),
+            """UPDATE events SET name = ?, client_name = ?, event_date = ?, gallery_url = ?,
+               status = ?, thumbnail_path = ? WHERE id = ?""",
+            (
+                name.strip(),
+                client_name.strip() or None,
+                event_date.strip() or None,
+                gallery_url,
+                status,
+                thumbnail_path,
+                event_id,
+            ),
         )
 
     message = "Event updated."
