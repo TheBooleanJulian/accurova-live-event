@@ -28,6 +28,7 @@ class Settings:
     PORTFOLIO_URL: str = os.environ.get("PORTFOLIO_URL", "https://accurova.com/")
     GOOGLE_REVIEWS_URL: str = os.environ.get("GOOGLE_REVIEWS_URL", "https://maps.app.goo.gl/JzfsHqPG3uGUjCFB6")
     SME_AWARD_URL: str = os.environ.get("SME_AWARD_URL", "https://www.instagram.com/p/DVtb4MpD5HH/")
+    CONSULTATION_WHATSAPP_URL: str = os.environ.get("CONSULTATION_WHATSAPP_URL", "https://wa.link/6y9sbx")
 
     EMAIL_PROVIDER: str = os.environ.get("EMAIL_PROVIDER", "none").lower()
     EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "Accurova <juliancheung@accurova.com>")

@@ -85,6 +85,7 @@ def root(request: Request):
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
+            "consultation_whatsapp_url": settings.CONSULTATION_WHATSAPP_URL,
             "latest_event": latest_event,
             "past_events": past_events,
         },
