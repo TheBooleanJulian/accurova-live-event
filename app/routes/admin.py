@@ -291,10 +291,10 @@ def export_signups_csv(request: Request, event_id: int):
     if not _is_logged_in(request):
         return RedirectResponse("/admin/login", status_code=303)
     rows = query_all(
-        "SELECT email, created_at, notified_at FROM email_signups WHERE event_id = ? ORDER BY created_at",
+        "SELECT name, email, created_at, notified_at FROM email_signups WHERE event_id = ? ORDER BY created_at",
         (event_id,),
     )
-    return _csv_response(rows, ["email", "created_at", "notified_at"], f"signups_event_{event_id}.csv")
+    return _csv_response(rows, ["name", "email", "created_at", "notified_at"], f"signups_event_{event_id}.csv")
 
 
 @router.get("/events/{event_id}/enquiries.csv")

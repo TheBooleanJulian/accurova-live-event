@@ -55,12 +55,12 @@
     <a class="link-btn" href="/admin/events/{{ event.id }}/signups.csv">Export CSV</a>
     <div class="table-scroll">
     <table>
-      <thead><tr><th>Email</th><th>Signed up</th><th>Notified</th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th><th>Signed up</th><th>Notified</th></tr></thead>
       <tbody>
         {% for s in signups %}
-        <tr><td>{{ s.email }}</td><td>{{ s.created_at }}</td><td>{{ s.notified_at or "—" }}</td></tr>
+        <tr><td>{{ s.name or "—" }}</td><td>{{ s.email }}</td><td>{{ s.created_at }}</td><td>{{ s.notified_at or "—" }}</td></tr>
         {% else %}
-        <tr><td colspan="3" style="color:var(--ink-faint);">No signups yet.</td></tr>
+        <tr><td colspan="4" style="color:var(--ink-faint);">No signups yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>

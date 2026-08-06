@@ -54,7 +54,16 @@ def event_landing(request: Request, slug: str):
 
 
 class SignupPayload(BaseModel):
+    name: str
     email: EmailStr
+
+    @field_validator("name")
+    @classmethod
+    def name_not_blank(cls, v):
+        v = v.strip()
+        if not v:
+            raise ValueError("Name is required")
+        return v[:200]
 
     @field_validator("email")
     @classmethod
@@ -73,8 +82,8 @@ def event_signup(slug: str, payload: SignupPayload, request: Request):
     try:
         with db_cursor() as cur:
             cur.execute(
-                "INSERT INTO email_signups (event_id, email) VALUES (?, ?)",
-                (event["id"], payload.email),
+                "INSERT INTO email_signups (event_id, name, email) VALUES (?, ?, ?)",
+                (event["id"], payload.name, payload.email),
             )
     except sqlite3.IntegrityError:
         # Already signed up for this event — treat as success, no need to error.

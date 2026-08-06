@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE TABLE IF NOT EXISTS email_signups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    name TEXT,                       -- nullable for rows created before the name field existed
     email TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     notified_at TEXT,
