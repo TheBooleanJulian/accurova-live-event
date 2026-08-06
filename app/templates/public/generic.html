@@ -38,7 +38,7 @@
   <div class="card card-primary">
     <p class="card-title">Looking for your event photos?</p>
     <p class="card-desc">Scan the QR code from your event to get to the right page, or message us directly and we'll help you find it.</p>
-    <a class="btn btn-primary" href="{{ whatsapp_link }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+    <a class="btn btn-primary" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message on WhatsApp</a>
   </div>
 
   <div class="card">
@@ -53,8 +53,36 @@
   </div>
 
   <div class="card">
-    <p class="card-title">Book Consultation</p>
-    <a class="btn btn-gold" href="{{ consultation_whatsapp_url }}" target="_blank" rel="noopener">Message via WhatsApp</a>
+    <p class="card-title">Book a corporate consultation</p>
+    <p class="card-desc">Planning your next event or shoot? Tell us a bit about it.</p>
+    <button class="btn btn-gold" id="open-enquiry">Book a Consultation</button>
+  </div>
+
+  <div class="card">
+    <p class="card-title">WhatsApp us</p>
+    <p class="card-desc">Fastest way to reach the team directly.</p>
+    <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">Message on WhatsApp</a>
+  </div>
+
+  <!-- Enquiry form (hidden until opened) -->
+  <div class="card" id="enquiry-card" style="display:none;">
+    <p class="card-title">Tell us about your event</p>
+    <form id="enquiry-form">
+      <input type="text" name="name" placeholder="Your name" required />
+      <input type="text" name="company" placeholder="Company" />
+      <input type="email" name="email" placeholder="Email" required />
+      <select name="event_type">
+        <option value="">Event type</option>
+        <option value="corporate_conference">Corporate conference</option>
+        <option value="product_launch">Product launch</option>
+        <option value="gala_dinner">Gala / dinner</option>
+        <option value="branding_shoot">Branding shoot</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea name="message" placeholder="A little about your event"></textarea>
+      <button type="submit" class="btn btn-gold">Send Enquiry</button>
+    </form>
+    <div id="enquiry-status" class="status-msg"></div>
   </div>
 
   {% if past_events %}
@@ -72,5 +100,47 @@
 
   <footer>ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA</footer>
 </div>
+
+<script>
+function showStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.classList.remove('ok', 'err');
+  el.classList.add('show', ok ? 'ok' : 'err');
+}
+
+document.getElementById('open-enquiry').addEventListener('click', () => {
+  const card = document.getElementById('enquiry-card');
+  card.style.display = card.style.display === 'none' ? 'block' : 'none';
+  if (card.style.display === 'block') card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+const enquiryForm = document.getElementById('enquiry-form');
+enquiryForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const statusEl = document.getElementById('enquiry-status');
+  const btn = enquiryForm.querySelector('button');
+  const formData = new FormData(enquiryForm);
+  const payload = Object.fromEntries(formData.entries());
+  btn.disabled = true;
+  try {
+    const res = await fetch('/enquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showStatus(statusEl, "Thanks — we'll be in touch shortly.", true);
+      enquiryForm.reset();
+    } else {
+      showStatus(statusEl, data.detail || 'Something went wrong. Please try again.', false);
+    }
+  } catch (err) {
+    showStatus(statusEl, 'Network error. Please try again.', false);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
 </body>
 </html>

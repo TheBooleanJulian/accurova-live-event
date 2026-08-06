@@ -16,25 +16,14 @@ templates = Jinja2Templates(directory="app/templates")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
-def whatsapp_link(prefill: str) -> str:
-    from urllib.parse import quote
-    number = settings.WHATSAPP_NUMBER
-    return f"https://wa.me/{number}?text={quote(prefill)}"
-
-
-# kept for internal call sites within this module
-_whatsapp_link = whatsapp_link
-
-
 @router.get("/e/{slug}", response_class=HTMLResponse)
 def event_landing(request: Request, slug: str):
     event = query_one("SELECT * FROM events WHERE slug = ?", (slug,))
-    whatsapp_link = _whatsapp_link("Hi Accurova, I'd like to enquire about photography for my event.")
 
     if not event:
         return templates.TemplateResponse(
             "public/not_found.html",
-            {"request": request, "whatsapp_link": whatsapp_link},
+            {"request": request, "whatsapp_url": settings.WHATSAPP_URL},
             status_code=404,
         )
 
@@ -48,7 +37,7 @@ def event_landing(request: Request, slug: str):
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
-            "whatsapp_link": whatsapp_link,
+            "whatsapp_url": settings.WHATSAPP_URL,
         },
     )
 
