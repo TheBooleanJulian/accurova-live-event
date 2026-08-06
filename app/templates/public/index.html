@@ -30,6 +30,15 @@
     <p class="card-title">Your photos are ready</p>
     <p class="card-desc">The full gallery from today's event has been processed and is ready to view and download.</p>
     <a class="btn btn-primary" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
+    {% if event.gallery_password %}
+    <div class="gallery-password">
+      <span class="gallery-password-label">Gallery password</span>
+      <div class="gallery-password-row">
+        <code id="gallery-password-value">{{ event.gallery_password }}</code>
+        <button type="button" class="btn-copy" id="copy-password-btn">Copy</button>
+      </div>
+    </div>
+    {% endif %}
   </div>
   {% else %}
   <div class="card card-primary">
@@ -166,6 +175,33 @@ enquiryForm.addEventListener('submit', async (e) => {
     btn.disabled = false;
   }
 });
+
+const copyPasswordBtn = document.getElementById('copy-password-btn');
+if (copyPasswordBtn) {
+  copyPasswordBtn.addEventListener('click', async () => {
+    const password = document.getElementById('gallery-password-value').textContent;
+    const originalLabel = copyPasswordBtn.textContent;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(password);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = password;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      copyPasswordBtn.textContent = 'Copied!';
+    } catch (err) {
+      copyPasswordBtn.textContent = 'Copy failed';
+    }
+    setTimeout(() => { copyPasswordBtn.textContent = originalLabel; }, 2000);
+  });
+}
 </script>
 </body>
 </html>
