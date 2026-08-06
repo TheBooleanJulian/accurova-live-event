@@ -150,6 +150,7 @@ h1.event-name {
   letter-spacing: 0.01em;
   min-height: 48px;
 }
+.btn + .btn { margin-top: 8px; }
 
 .btn-primary {
   background: var(--teal);
@@ -207,6 +208,32 @@ textarea { resize: vertical; min-height: 80px; }
 .status-msg.show { display: block; }
 .status-msg.ok { background: rgba(0, 168, 158, 0.1); color: var(--teal-ink); }
 .status-msg.err { background: rgba(200, 60, 60, 0.1); color: #c83c3c; }
+
+.latest-event-card {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  border: 1px solid rgba(0, 168, 158, 0.35);
+  background: rgba(0, 168, 158, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.latest-event-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+.latest-event-body { padding: 16px 20px; }
+.latest-event-cta {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--teal-ink);
+}
 
 .section-title {
   font-family: var(--font-mono);

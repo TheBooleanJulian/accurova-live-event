@@ -64,10 +64,15 @@ def root(request: Request):
     if live_count and live_count["c"] == 1 and live_events:
         return RedirectResponse(f"/e/{live_events['slug']}", status_code=303)
 
+    latest_event = query_one(
+        "SELECT id, slug, name, event_date, thumbnail_path FROM events ORDER BY COALESCE(event_date, created_at) DESC LIMIT 1"
+    )
+
     past_events = query_all(
         """SELECT slug, name, event_date, thumbnail_path FROM events
-           WHERE thumbnail_path IS NOT NULL
-           ORDER BY COALESCE(event_date, created_at) DESC LIMIT 7"""
+           WHERE thumbnail_path IS NOT NULL AND id != ?
+           ORDER BY COALESCE(event_date, created_at) DESC LIMIT 7""",
+        (latest_event["id"] if latest_event else -1,),
     )
 
     return templates.TemplateResponse(
@@ -76,9 +81,11 @@ def root(request: Request):
             "request": request,
             "whatsapp_link": whatsapp_link("Hi Accurova, I'd like to enquire about photography for my event."),
             "linkedin_url": settings.LINKEDIN_URL,
+            "linkedin_company_url": settings.LINKEDIN_COMPANY_URL,
             "portfolio_url": settings.PORTFOLIO_URL,
             "google_reviews_url": settings.GOOGLE_REVIEWS_URL,
             "sme_award_url": settings.SME_AWARD_URL,
+            "latest_event": latest_event,
             "past_events": past_events,
         },
     )

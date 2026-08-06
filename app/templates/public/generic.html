@@ -21,6 +21,20 @@
 
   <hr class="hairline" />
 
+  {% if latest_event %}
+  <a class="latest-event-card" href="/e/{{ latest_event.slug }}">
+    {% if latest_event.thumbnail_path %}
+    <img src="{{ latest_event.thumbnail_path }}" alt="{{ latest_event.name }}" class="latest-event-thumb" />
+    {% endif %}
+    <div class="latest-event-body">
+      <p class="section-title" style="margin:0 0 4px;">Latest event</p>
+      <p class="card-title" style="margin:0 0 2px;">{{ latest_event.name }}</p>
+      {% if latest_event.event_date %}<p class="card-desc" style="margin:0;">{{ latest_event.event_date }}</p>{% endif %}
+      <span class="latest-event-cta">View event page &rarr;</span>
+    </div>
+  </a>
+  {% endif %}
+
   <div class="card card-primary">
     <p class="card-title">Looking for your event photos?</p>
     <p class="card-desc">Scan the QR code from your event to get to the right page, or message us directly and we'll help you find it.</p>
@@ -29,12 +43,13 @@
 
   <div class="card">
     <p class="card-title">Connect on LinkedIn</p>
-    <a class="btn btn-outline" href="{{ linkedin_url }}" target="_blank" rel="noopener">Connect on LinkedIn</a>
+    <a class="btn btn-outline" href="{{ linkedin_url }}" target="_blank" rel="noopener">Julian Cheung Jun Yan</a>
+    <a class="btn btn-outline" href="{{ linkedin_company_url }}" target="_blank" rel="noopener">Accurova</a>
   </div>
 
   <div class="card">
     <p class="card-title">View our portfolio</p>
-    <a class="btn btn-outline" href="{{ portfolio_url }}" target="_blank" rel="noopener">View Portfolio</a>
+    <a class="btn btn-outline" href="{{ portfolio_url }}" target="_blank" rel="noopener">Accurova.com</a>
   </div>
 
   {% if past_events %}

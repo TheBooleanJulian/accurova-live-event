@@ -24,6 +24,7 @@ class Settings:
 
     WHATSAPP_NUMBER: str = os.environ.get("WHATSAPP_NUMBER", "+6598566543")
     LINKEDIN_URL: str = os.environ.get("LINKEDIN_URL", "https://www.linkedin.com/in/juliancheungjunyan/")
+    LINKEDIN_COMPANY_URL: str = os.environ.get("LINKEDIN_COMPANY_URL", "https://www.linkedin.com/company/accurova/")
     PORTFOLIO_URL: str = os.environ.get("PORTFOLIO_URL", "https://accurova.com/")
     GOOGLE_REVIEWS_URL: str = os.environ.get("GOOGLE_REVIEWS_URL", "https://maps.app.goo.gl/JzfsHqPG3uGUjCFB6")
     SME_AWARD_URL: str = os.environ.get("SME_AWARD_URL", "https://www.instagram.com/p/DVtb4MpD5HH/")
