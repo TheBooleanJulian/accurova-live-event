@@ -120,17 +120,17 @@ h1.event-name {
 }
 
 .card {
-  border: 1px solid var(--hairline);
+  border: 1px solid rgba(0, 168, 158, 0.35);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 14px;
-  background: var(--bg);
+  background: rgba(0, 168, 158, 0.04);
   box-shadow: 0 1px 2px rgba(10, 14, 20, 0.04);
 }
 
 .card-primary {
-  border-color: rgba(0, 168, 158, 0.35);
-  background: rgba(0, 168, 158, 0.05);
+  border-color: rgba(185, 134, 10, 0.4);
+  background: rgba(185, 134, 10, 0.06);
 }
 
 .card-title {
@@ -291,14 +291,14 @@ textarea { resize: vertical; min-height: 80px; }
   display: block;
   text-decoration: none;
   color: var(--ink);
-  border: 1px solid var(--hairline);
+  border: 1px solid rgba(0, 168, 158, 0.35);
   border-radius: 8px;
   overflow: hidden;
-  background: var(--bg);
+  background: rgba(0, 168, 158, 0.04);
 }
 .carousel-card:first-child {
-  border-color: rgba(0, 168, 158, 0.35);
-  background: rgba(0, 168, 158, 0.05);
+  border-color: rgba(185, 134, 10, 0.4);
+  background: rgba(185, 134, 10, 0.06);
 }
 .carousel-card-thumb {
   display: block;

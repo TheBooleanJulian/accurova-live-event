@@ -23,6 +23,8 @@ class Settings:
     PUBLIC_BASE_URL: str = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
 
     WHATSAPP_URL: str = os.environ.get("WHATSAPP_URL", "https://wa.link/6y9sbx")
+    WHATSAPP_DISPLAY_NUMBER: str = os.environ.get("WHATSAPP_DISPLAY_NUMBER", "+65 9856 6543")
+    CONTACT_NAME: str = os.environ.get("CONTACT_NAME", "Julian Cheung (Photographer Accurova)")
     LINKEDIN_URL: str = os.environ.get("LINKEDIN_URL", "https://www.linkedin.com/in/juliancheungjunyan/")
     LINKEDIN_COMPANY_URL: str = os.environ.get("LINKEDIN_COMPANY_URL", "https://www.linkedin.com/company/accurova/")
     PORTFOLIO_URL: str = os.environ.get("PORTFOLIO_URL", "https://accurova.com/")

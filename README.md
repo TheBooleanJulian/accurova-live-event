@@ -27,7 +27,9 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload (manual or auto-pulled from the gallery's preview image)
 - Unified signups/enquiries views in admin — every event's data in one sortable table each, with an event-name column ("Unassigned" for enquiries submitted from the homepage), each with its own CSV export
 - Gallery password shown with a copy-to-clipboard button on the public page and included in the "photos ready" notification email
-- Homepage leads with a swipeable carousel — latest event first, then up to 7 past events with thumbnails, arrow-navigable; visitors click in themselves, no auto-redirect
+- Homepage leads with a swipeable carousel — latest event first (gold accent), then up to 7 past events with thumbnails (teal accent), arrow-navigable; visitors click in themselves, no auto-redirect
+- Per-event "show on homepage" toggle in the admin dashboard — instantly include/exclude an event from the carousel
+- One-click "save to contacts" button generates a vCard (.vcf) for the primary contact
 - IP rate limiting on signup and enquiry endpoints
 - Auto-applies DB schema on startup — no manual migration step needed
 - Server-rendered Jinja2 templates, no frontend build step
@@ -67,9 +69,12 @@ Visit `http://localhost:8000/admin`, log in with `ADMIN_PASSWORD`, create an eve
 | `UPLOADS_DIR` | No | Directory for uploaded event thumbnails, served at `/uploads/*` (default: `./data/uploads`) |
 | `PUBLIC_BASE_URL` | Yes | Base URL of the deployment |
 | `WHATSAPP_URL` | No | Single destination every "Message on WhatsApp" CTA site-wide links to |
-| `LINKEDIN_URL` / `LINKEDIN_COMPANY_URL` | No | Personal and company LinkedIn links shown as two buttons on the public page |
+| `WHATSAPP_DISPLAY_NUMBER` | No | Number shown in the WhatsApp button text (display-only) |
+| `LINKEDIN_URL` | No | Personal LinkedIn link shown on the public page |
+| `LINKEDIN_COMPANY_URL` | No | Company LinkedIn URL — kept in config but not currently linked anywhere (button hidden) |
 | `PORTFOLIO_URL` | No | Outbound portfolio link shown on the public event page |
 | `GOOGLE_REVIEWS_URL` / `SME_AWARD_URL` | No | Destinations for the "★ 5.0 GOOGLE" and "SME500 AWARD" badges |
+| `CONTACT_NAME` | No | Name used for the "save to contacts" button, vCard FN, and .vcf filename |
 | `EMAIL_PROVIDER` | No | `resend` \| `postmark` \| `smtp` \| `none` (default: `none`) |
 | `EMAIL_FROM` | No | From header used for notification emails |
 | `RESEND_API_KEY` | No | Required if `EMAIL_PROVIDER=resend` |
