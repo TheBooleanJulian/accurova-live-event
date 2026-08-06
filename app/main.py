@@ -12,6 +12,22 @@ from app.db import query_all, query_one
 app = FastAPI(title="Accurova Live Event", docs_url=None, redoc_url=None)
 
 
+@app.middleware("http")
+async def _no_store_admin(request: Request, call_next):
+    """
+    /admin/* responses carry a session-gated dashboard and PII (signups,
+    enquiries) — an intermediate CDN (e.g. Cloudflare in front of Zeabur)
+    must never cache them, or an unauthenticated visitor can be served a
+    stale, already-authenticated response straight from cache, bypassing
+    the app's own login check entirely.
+    """
+    response = await call_next(request)
+    if request.url.path.startswith("/admin"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+        response.headers["Pragma"] = "no-cache"
+    return response
+
+
 @app.on_event("startup")
 def _apply_schema() -> None:
     """
