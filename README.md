@@ -6,7 +6,7 @@
 
 ![Accurova Live Event](assets/accurova-live-event-card.png)
 
-![Version](https://img.shields.io/badge/version-1.35.0-00D4C8)
+![Version](https://img.shields.io/badge/version-1.36.0-00D4C8)
 ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
 ![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -138,6 +138,7 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - [x] CDN caching disabled for all dynamic routes (prevents stale/authenticated pages being served to the wrong visitor)
 - [x] Themed per-card icons and accent-matched CTA button colors across every public page
 - [x] Live status can be set manually in admin, independent of the event date
+- [x] Public pages (homepage + event page) redesigned around a single hierarchy — hero, gallery/CTA, compact trust strip, soft-sell pitch, contact grid, footer
 
 **Future Roadmap / Suggestions**
 
@@ -152,16 +153,15 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - Admin audit log — track who changed event status/gallery URLs and when, useful once multi-admin access lands
 - CRM/webhook integration — push new signups and enquiries to Zapier/Make or a webhook endpoint in real time
 
-**Proposed Event-Page Redesign**
+**Event-Page Redesign** — implemented on both the homepage and per-event page, reshaped around a single hierarchy — hero → current event / gallery CTA → compact trust strip → soft-sell pitch → contact grid → footer:
 
-Reshape the per-event page around a single hierarchy — logo → current event → huge "View Gallery" CTA → gallery preview → trust badges → soft sales pitch → contact grid → footer — instead of today's equal-weight card grid:
-
-- Hero: banner + one-line positioning ("Corporate Event Photography") + star rating + "Trusted by leading companies in Singapore"
-- Gallery section promoted to the main focus, with live status ("🔴 LIVE NOW"), last-updated time, and photo count surfaced next to the CTA (e.g. "Last updated: 2:15 PM · 428 photos available") to reassure attendees more are coming
-- Compact, visual-only trust strip (award, rating, press mentions) — no paragraphs
-- Soft-sell section explaining what Accurova shoots (conferences, launches, awards, executive events) ending in a single "Request a Quote" CTA
-- Contact options condensed into a simple grid (WhatsApp, Portfolio, LinkedIn, Save Contact)
-- "Book Consultation" and top-of-page LinkedIn demoted/relocated — currently competing for attention with primary actions
+- [x] Hero: banner + one-line positioning ("Corporate Event Photography") + star rating + "Trusted by leading companies in Singapore"
+- [x] Gallery/CTA kept as the main focus directly under the hero, with live status ("🔴 LIVE NOW")
+- [x] Compact, visual-only trust strip (award, rating, press mentions) — no paragraphs
+- [x] Soft-sell section explaining what Accurova shoots (conferences, launches, awards, executive events) ending in a single "Request a Quote" CTA
+- [x] Contact options condensed into a simple 2x2 grid (WhatsApp, Portfolio, LinkedIn, Save Contact)
+- [x] "Book Consultation" and standalone LinkedIn card removed — folded into the soft-sell CTA and contact grid respectively
+- [ ] Last-updated time / photo count next to the gallery CTA — blocked on live gallery-status data; not available until the Piufoto-powered live gallery integration lands
 
 **Long-Term Vision — Auto-Generated Event Pages**
 
@@ -177,6 +177,7 @@ Summarised from commit history, most recent first.
 
 Every distinct feature or fix gets its own `MINOR` bump for full traceability — versions increment `+0.1` per change rather than batching multiple changes under one release.
 
+- **2026-08-07 (1.36.0)** — Homepage and event page redesigned around a single hierarchy (hero, gallery/CTA, compact trust strip, soft-sell pitch, contact grid); "Book Consultation" and standalone LinkedIn cards folded into the new soft-sell CTA and contact grid
 - **2026-08-07 (1.35.0)** — README hero image added
 - **2026-08-07 (1.34.0)** — Save-to-contacts vCard now includes the website URL
 - **2026-08-07 (1.33.0)** — Remaining outline CTA buttons (LinkedIn, portfolio, save-contact, WhatsApp) filled with their card's accent color, matching the rest
