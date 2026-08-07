@@ -4,7 +4,7 @@
 
 **Mobile-first event landing page + admin dashboard — one deployment serves every live event via a unique QR-code URL.**
 
-![Version](https://img.shields.io/badge/version-1.0.1-00D4C8)
+![Version](https://img.shields.io/badge/version-1.1.0-00D4C8)
 ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
 ![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -125,6 +125,13 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - [x] IP rate limiting on public endpoints
 - [x] Auto-applied DB schema on startup
 - [x] Root route fixed — no longer redirects visitors to admin login
+- [x] Light-mode design system with gold/teal accent cards
+- [x] Event thumbnails — manual upload or auto-pulled from the gallery's preview image
+- [x] Homepage carousel — looping, arrow-navigable, latest event + up to 7 past events, with a live-now badge
+- [x] Gallery password with copy-to-clipboard, shown on the public page and in the notification email
+- [x] Save-to-contacts vCard button
+- [x] Unified signups/enquiries admin views with per-event CSV export
+- [x] CDN caching disabled for all dynamic routes (prevents stale/authenticated pages being served to the wrong visitor)
 
 **Future Roadmap / Suggestions**
 
@@ -138,20 +145,32 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - Shared-store rate limiting — swap the in-memory limiter for Redis (or edge-level throttling) to support multi-instance deployments
 - Admin audit log — track who changed event status/gallery URLs and when, useful once multi-admin access lands
 - CRM/webhook integration — push new signups and enquiries to Zapier/Make or a webhook endpoint in real time
-- "Past 7 events" showcase — surface the 7 most recent completed events (name, date, thumbnail/link) on the generic bare-domain landing page as social proof for visitors with no live event to land on
 
 Have another idea? Open an issue or use the feedback form below.
 
 ## Changelog
 
-Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`) going forward:
-
-- **MAJOR** — breaking changes (schema changes requiring migration, removed routes/env vars, incompatible API changes)
-- **MINOR** — backwards-compatible features (new admin capability, new public-page flow, new env var with a safe default)
-- **PATCH** — backwards-compatible fixes and small tweaks
+Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`).
 
 Summarised from commit history, most recent first.
 
+- **2026-08-07 (1.1.0)** — New "Accurova Live Event" banner replaces the old logo + separate text title site-wide, now clickable straight to the homepage
+- **2026-08-07** — Static assets (`style.css`, etc.) now cache-busted with a version query param, so a redeploy's fixes aren't stuck behind a stale CDN/browser cache — the /static exemption from the no-store middleware had let this happen silently
+- **2026-08-07** — Homepage carousel now loops seamlessly (clones + silent snap-back instead of a hard stop); live events get a "LIVE NOW" badge wherever they appear; event thumbnails and gallery password added to the individual event subpage; header reordered banner-first
+- **2026-08-07** — Gold/teal accent card system across the site; WhatsApp button copy updated; save-to-contacts vCard button; per-event "show on homepage" toggle in admin
+- **2026-08-07** — Signups and enquiries unified into single admin-wide views (one sortable table per type, event-name column, per-view CSV export); homepage rebuilt around a swipeable event carousel
+- **2026-08-07** — Site-title home link added to every page; event thumbnail now auto-pulled from the gallery URL's preview image when not manually uploaded
+- **2026-08-07** — All WhatsApp CTAs unified to a single configurable `WHATSAPP_URL`; consultation enquiry form added to the homepage
+- **2026-08-07** — `/admin/*` no-store caching extended to all dynamic routes, not just admin — closes a gap where an intermediate CDN could still cache a signed-in response
+- **2026-08-07** — Gallery password field with copy-to-clipboard added to the public event page
+- **2026-08-07** — Photo-notify signup form now collects the attendee's name
+- **2026-08-07** — "Book a Consultation" WhatsApp card added to the homepage
+- **2026-08-07** — Homepage now highlights the latest event; LinkedIn split into separate personal/company buttons
+- **2026-08-07** — Admin can now edit an event's slug and delete events
+- **2026-08-07** — SME award and Google review badges made clickable; thumbnail upload limit raised from 5MB to 25MB
+- **2026-08-07 (1.0.2)** — Prevented CDN caching of `/admin/*` — closed an auth-bypass where a cached dashboard response could be served to an unauthenticated visitor
+- **2026-08-07** — Event thumbnail upload added, with a "past events" showcase on the homepage
+- **2026-08-07** — Switched to a light-mode design system with the Accurova banner logo
 - **2026-08-04 (1.0.1)** — Docs updated: `WHATSAPP_NUMBER` format clarified, default contact info (WhatsApp, LinkedIn, portfolio, email-from) updated; changelog and roadmap added to README
 - **2026-08-04** — DB schema now auto-applied on startup; removes the need to run `init_db.py` manually before first launch
 - **2026-08-04** — Fixed root route incorrectly redirecting public visitors to the admin login page
