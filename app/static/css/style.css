@@ -79,6 +79,21 @@ body {
 }
 .brand span { color: var(--teal-ink); }
 
+.hero-tagline {
+  font-family: var(--font-head);
+  font-size: 14px;
+  color: var(--ink-dim);
+  margin: 2px 0 6px;
+}
+
+.hero-rating {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin: 0;
+}
+.hero-rating .stars { color: var(--gold); letter-spacing: 1px; }
+
 .badge-row {
   display: flex;
   flex-wrap: wrap;
@@ -333,6 +348,48 @@ textarea { resize: vertical; min-height: 80px; }
 .status-msg.show { display: block; }
 .status-msg.ok { background: rgba(0, 168, 158, 0.1); color: var(--teal-ink); }
 .status-msg.err { background: rgba(200, 60, 60, 0.1); color: #c83c3c; }
+
+.soft-sell-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+.soft-sell-list li {
+  font-size: 13px;
+  color: var(--ink-dim);
+  padding-left: 14px;
+  position: relative;
+}
+.soft-sell-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.contact-card {
+  display: block;
+  text-decoration: none;
+  color: var(--ink);
+  text-align: center;
+  padding: 18px 12px;
+  cursor: pointer;
+}
+.contact-card .card-icon { margin: 0 auto 10px; }
+.contact-card .card-title { font-size: 14px; margin: 0; }
 
 .section-title {
   font-family: var(--font-mono);
