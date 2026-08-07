@@ -49,5 +49,10 @@ class Settings:
     ENV: str = os.environ.get("ENV", "development")
     PORT: int = int(os.environ.get("PORT", "8000"))
 
+    # Cache-busting query param for /static assets (e.g. style.css) — those
+    # are exempt from the no-store middleware so an intermediate CDN or a
+    # browser can otherwise keep serving a stale copy across deploys.
+    ASSET_V: int = int((ROOT / "app" / "static" / "css" / "style.css").stat().st_mtime)
+
 
 settings = Settings()
