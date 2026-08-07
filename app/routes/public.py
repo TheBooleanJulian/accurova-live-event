@@ -61,6 +61,7 @@ def contact_vcard():
         "N:Cheung;Julian;;;\r\n"
         "ORG:Accurova\r\n"
         f"TEL;TYPE=CELL,VOICE:{digits}\r\n"
+        f"URL:{settings.PORTFOLIO_URL}\r\n"
         "END:VCARD\r\n"
     )
     return Response(

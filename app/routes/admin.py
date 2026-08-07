@@ -84,7 +84,15 @@ def _fetch_gallery_thumbnail(event_id: int, gallery_url: str) -> str:
     """Fetches the gallery page, pulls its og:image/twitter:image preview, downloads
     it, and saves it as this event's thumbnail. Raises ValueError with a
     user-facing message on any failure (no preview tag, unsupported type, too big)."""
-    with httpx.Client(timeout=10, follow_redirects=True) as client:
+    # Gallery hosts (e.g. Pixieset) return 403 to requests without a
+    # browser-like User-Agent, so we spoof one here.
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        )
+    }
+    with httpx.Client(timeout=10, follow_redirects=True, headers=headers) as client:
         try:
             page_resp = client.get(gallery_url)
             page_resp.raise_for_status()
