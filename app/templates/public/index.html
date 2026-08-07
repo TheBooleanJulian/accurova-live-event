@@ -17,14 +17,15 @@
   <div class="badge-row">
     <a class="badge" href="{{ sme_award_url }}" target="_blank" rel="noopener">SME500 AWARD 2026</a>
     <a class="badge" href="{{ google_reviews_url }}" target="_blank" rel="noopener">★ 5.0 GOOGLE</a>
-    <span class="badge">900+ SHOOTS</span>
+    <span class="badge">FEATURED IN STRAITS TIMES + LHZB</span>
   </div>
 
   <hr class="hairline" />
 
+  {% set is_live = event.event_date == today or event.status == "live" %}
   <h1 class="event-name">{{ event.name }}</h1>
   <p class="event-meta">{% if event.client_name %}{{ event.client_name }} &middot; {% endif %}{{ event.event_date or "" }}</p>
-  {% if event.event_date == today %}
+  {% if is_live %}
   <div class="live-badge">🔴 LIVE NOW</div>
   {% endif %}
 
@@ -33,19 +34,19 @@
   {% endif %}
 
   {% if event.status == "photos_ready" and event.gallery_url %}
-  <div class="card card-primary{% if event.event_date == today %} is-live{% endif %}">
+  <div class="card card-primary{% if is_live %} is-live{% endif %}">
     <p class="card-title">Your photos are ready</p>
     <p class="card-desc">The full gallery from today's event has been processed and is ready to view and download.</p>
-    <a class="btn btn-primary" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
+    <a class="btn btn-gold" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
   </div>
   {% else %}
-  <div class="card card-primary{% if event.event_date == today %} is-live{% endif %}">
+  <div class="card card-primary{% if is_live %} is-live{% endif %}">
     <p class="card-title">Get today's event photos</p>
     <p class="card-desc">Photos are still being processed. Leave your email and we'll notify you the moment they're ready.</p>
     <form id="signup-form">
       <input type="text" id="signup-name" name="name" placeholder="Your name" required autocomplete="name" />
       <input type="email" id="signup-email" name="email" placeholder="you@company.com" required autocomplete="email" />
-      <button type="submit" class="btn btn-primary">Notify Me</button>
+      <button type="submit" class="btn btn-gold">Notify Me</button>
     </form>
     <div id="signup-status" class="status-msg"></div>
     <p class="form-note">We'll only use this to send your event photo link. No spam.</p>
@@ -83,7 +84,7 @@
   <div class="card">
     <p class="card-title">Book a corporate consultation</p>
     <p class="card-desc">Planning your next event or shoot? Tell us a bit about it.</p>
-    <button class="btn btn-gold" id="open-enquiry">Book a Consultation</button>
+    <button class="btn btn-primary" id="open-enquiry">Book a Consultation</button>
   </div>
 
   <div class="card">
@@ -108,12 +109,15 @@
         <option value="other">Other</option>
       </select>
       <textarea name="message" placeholder="A little about your event"></textarea>
-      <button type="submit" class="btn btn-gold">Send Enquiry</button>
+      <button type="submit" class="btn btn-primary">Send Enquiry</button>
     </form>
     <div id="enquiry-status" class="status-msg"></div>
   </div>
 
-  <footer>ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA</footer>
+  <footer>
+    ACCUROVA &middot; PREMIUM PHOTOGRAPHY &amp; DIGITAL MEDIA<br />
+    Built by <a href="https://github.com/TheBooleanJulian">@TheBooleanJulian</a>
+  </footer>
 </div>
 
 <script>

@@ -63,13 +63,13 @@ def root(request: Request):
     directly — it's never linked from here.
     """
     latest_event = query_one(
-        """SELECT id, slug, name, event_date, thumbnail_path FROM events
+        """SELECT id, slug, name, event_date, thumbnail_path, status FROM events
            WHERE show_on_homepage = 1
            ORDER BY COALESCE(event_date, created_at) DESC LIMIT 1"""
     )
 
     past_events = query_all(
-        """SELECT slug, name, event_date, thumbnail_path FROM events
+        """SELECT slug, name, event_date, thumbnail_path, status FROM events
            WHERE show_on_homepage = 1 AND thumbnail_path IS NOT NULL AND id != ?
            ORDER BY COALESCE(event_date, created_at) DESC LIMIT 7""",
         (latest_event["id"] if latest_event else -1,),
