@@ -1,5 +1,6 @@
 import re
 import sqlite3
+from datetime import date
 
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, Response
@@ -43,6 +44,7 @@ def event_landing(request: Request, slug: str):
             "whatsapp_url": settings.WHATSAPP_URL,
             "whatsapp_display_number": settings.WHATSAPP_DISPLAY_NUMBER,
             "contact_name": settings.CONTACT_NAME,
+            "today": date.today().isoformat(),
         },
     )
 

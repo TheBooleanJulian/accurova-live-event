@@ -10,7 +10,6 @@
 <body>
 <div class="wrap">
 
-  <a href="/" class="site-title">Accurova Live Event</a>
   <p class="eyebrow">Official Photography Partner</p>
   <div class="brand-header">
     <img src="/static/img/accurova-banner.png" alt="Accurova — Accuracy. Innovation." class="brand-logo" />
@@ -20,29 +19,28 @@
     <a class="badge" href="{{ google_reviews_url }}" target="_blank" rel="noopener">★ 5.0 GOOGLE</a>
     <span class="badge">900+ SHOOTS</span>
   </div>
+  <a href="/" class="site-title">Accurova Live Event</a>
 
   <hr class="hairline" />
 
   <h1 class="event-name">{{ event.name }}</h1>
   <p class="event-meta">{% if event.client_name %}{{ event.client_name }} &middot; {% endif %}{{ event.event_date or "" }}</p>
+  {% if event.event_date == today %}
+  <div class="live-badge">🔴 LIVE NOW</div>
+  {% endif %}
+
+  {% if event.thumbnail_path %}
+  <img src="{{ event.thumbnail_path }}" alt="{{ event.name }}" class="event-thumb" />
+  {% endif %}
 
   {% if event.status == "photos_ready" and event.gallery_url %}
-  <div class="card card-primary">
+  <div class="card card-primary{% if event.event_date == today %} is-live{% endif %}">
     <p class="card-title">Your photos are ready</p>
     <p class="card-desc">The full gallery from today's event has been processed and is ready to view and download.</p>
     <a class="btn btn-primary" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
-    {% if event.gallery_password %}
-    <div class="gallery-password">
-      <span class="gallery-password-label">Gallery password</span>
-      <div class="gallery-password-row">
-        <code id="gallery-password-value">{{ event.gallery_password }}</code>
-        <button type="button" class="btn-copy" id="copy-password-btn">Copy</button>
-      </div>
-    </div>
-    {% endif %}
   </div>
   {% else %}
-  <div class="card card-primary">
+  <div class="card card-primary{% if event.event_date == today %} is-live{% endif %}">
     <p class="card-title">Get today's event photos</p>
     <p class="card-desc">Photos are still being processed. Leave your email and we'll notify you the moment they're ready.</p>
     <form id="signup-form">
@@ -52,6 +50,16 @@
     </form>
     <div id="signup-status" class="status-msg"></div>
     <p class="form-note">We'll only use this to send your event photo link. No spam.</p>
+  </div>
+  {% endif %}
+
+  {% if event.gallery_password %}
+  <div class="card">
+    <p class="card-title">Gallery password</p>
+    <div class="gallery-password-row">
+      <code id="gallery-password-value">{{ event.gallery_password }}</code>
+      <button type="button" class="btn-copy" id="copy-password-btn">Copy</button>
+    </div>
   </div>
   {% endif %}
 

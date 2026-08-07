@@ -10,7 +10,6 @@
 <body>
 <div class="wrap">
 
-  <a href="/" class="site-title">Accurova Live Event</a>
   <div class="brand-header">
     <img src="/static/img/accurova-banner.png" alt="Accurova — Accuracy. Innovation." class="brand-logo" />
   </div>
@@ -19,13 +18,14 @@
     <a class="badge" href="{{ google_reviews_url }}" target="_blank" rel="noopener">★ 5.0 GOOGLE</a>
     <span class="badge">900+ SHOOTS</span>
   </div>
+  <a href="/" class="site-title">Accurova Live Event</a>
 
   <hr class="hairline" />
 
   {% if latest_event %}
   <div class="event-carousel-wrap">
     <div class="event-carousel" id="event-carousel">
-      <a class="carousel-card" href="/e/{{ latest_event.slug }}">
+      <a class="carousel-card carousel-card-featured{% if latest_event.event_date == today %} is-live{% endif %}" href="/e/{{ latest_event.slug }}">
         {% if latest_event.thumbnail_path %}
         <img src="{{ latest_event.thumbnail_path }}" alt="{{ latest_event.name }}" class="carousel-card-thumb" />
         {% endif %}
@@ -33,13 +33,15 @@
           <p class="section-title" style="margin:0 0 4px;">Latest event</p>
           <p class="card-title" style="margin:0 0 2px;">{{ latest_event.name }}</p>
           {% if latest_event.event_date %}<p class="card-desc" style="margin:0;">{{ latest_event.event_date }}</p>{% endif %}
+          {% if latest_event.event_date == today %}<p class="live-badge" style="margin:0;">🔴 LIVE NOW</p>{% endif %}
         </div>
       </a>
       {% for e in past_events %}
-      <a class="carousel-card" href="/e/{{ e.slug }}">
+      <a class="carousel-card{% if e.event_date == today %} is-live{% endif %}" href="/e/{{ e.slug }}">
         <img src="{{ e.thumbnail_path }}" alt="{{ e.name }}" class="carousel-card-thumb" loading="lazy" />
         <div class="carousel-card-body">
           <p class="card-title" style="margin:0;">{{ e.name }}</p>
+          {% if e.event_date == today %}<p class="live-badge" style="margin:6px 0 0;">🔴 LIVE NOW</p>{% endif %}
         </div>
       </a>
       {% endfor %}
@@ -154,12 +156,51 @@ const carousel = document.getElementById('event-carousel');
 const carouselPrev = document.getElementById('carousel-prev');
 const carouselNext = document.getElementById('carousel-next');
 if (carousel && carouselPrev && carouselNext) {
-  const scrollByCard = (dir) => {
+  const cards = Array.from(carousel.children);
+  const cardWidth = () => {
     const card = carousel.querySelector('.carousel-card');
-    if (!card) return;
     const gap = parseFloat(getComputedStyle(carousel).columnGap || getComputedStyle(carousel).gap || '0');
-    carousel.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: 'smooth' });
+    return card.getBoundingClientRect().width + gap;
   };
+
+  if (cards.length > 1) {
+    // Loop the carousel by cloning the edge cards and silently snapping back
+    // when scroll reaches a clone, so arrows/swipes never hit a hard stop.
+    const firstClone = cards[0].cloneNode(true);
+    const lastClone = cards[cards.length - 1].cloneNode(true);
+    firstClone.setAttribute('aria-hidden', 'true');
+    lastClone.setAttribute('aria-hidden', 'true');
+    carousel.appendChild(firstClone);
+    carousel.insertBefore(lastClone, cards[0]);
+    carousel.scrollLeft = cardWidth();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { carousel.scrollLeft = cardWidth(); }, 150);
+    });
+
+    let scrollTimer;
+    carousel.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const w = cardWidth();
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        if (carousel.scrollLeft <= 2) {
+          carousel.scrollLeft = maxScroll - w;
+        } else if (carousel.scrollLeft >= maxScroll - 2) {
+          carousel.scrollLeft = w;
+        }
+      }, 120);
+    });
+
+    let autoplay = setInterval(() => scrollByCard(1), 5000);
+    carousel.addEventListener('pointerdown', () => clearInterval(autoplay));
+  }
+
+  function scrollByCard(dir) {
+    carousel.scrollBy({ left: dir * cardWidth(), behavior: 'smooth' });
+  }
   carouselPrev.addEventListener('click', () => scrollByCard(-1));
   carouselNext.addEventListener('click', () => scrollByCard(1));
 }
