@@ -58,7 +58,6 @@ body {
 .brand-logo {
   display: block;
   width: 100%;
-  max-width: 320px;
   height: auto;
 }
 
@@ -91,11 +90,15 @@ body {
   font-size: 10px;
   letter-spacing: 0.05em;
   color: var(--ink-dim);
-  border: 1px solid var(--hairline);
+  border: 1px solid var(--ink-faint);
   padding: 4px 8px;
   border-radius: 3px;
   text-decoration: none;
   display: inline-block;
+}
+a.badge {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 a.badge:active { border-color: var(--teal); color: var(--teal-ink); }
 
@@ -370,6 +373,13 @@ footer {
   font-size: 10px;
   color: var(--ink-faint);
   letter-spacing: 0.05em;
+  line-height: 1.8;
+}
+footer a {
+  color: var(--ink-faint);
+}
+footer a:hover, footer a:active {
+  color: var(--teal-ink);
 }
 
 /* --- Admin --- */
