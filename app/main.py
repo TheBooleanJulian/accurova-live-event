@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -85,6 +87,7 @@ def root(request: Request):
             "contact_name": settings.CONTACT_NAME,
             "latest_event": latest_event,
             "past_events": past_events,
+            "today": date.today().isoformat(),
         },
     )
 
