@@ -13,6 +13,7 @@ from app.security import enforce_rate_limit
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+templates.env.globals["asset_v"] = settings.ASSET_V
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 

@@ -22,6 +22,7 @@ from app.config import settings
 
 router = APIRouter(prefix="/admin")
 templates = Jinja2Templates(directory="app/templates")
+templates.env.globals["asset_v"] = settings.ASSET_V
 
 
 def _slugify(value: str) -> str:

@@ -42,6 +42,7 @@ def _apply_schema() -> None:
     init_db(settings.DB_PATH)
 
 templates = Jinja2Templates(directory="app/templates")
+templates.env.globals["asset_v"] = settings.ASSET_V
 
 settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
