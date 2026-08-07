@@ -4,7 +4,7 @@
 
 **Mobile-first event landing page + admin dashboard — one deployment serves every live event via a unique QR-code URL.**
 
-![Version](https://img.shields.io/badge/version-1.1.0-00D4C8)
+![Version](https://img.shields.io/badge/version-1.2.0-00D4C8)
 ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
 ![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -27,9 +27,11 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Admin dashboard: event CRUD, status management, gallery URL + password, thumbnail upload (manual or auto-pulled from the gallery's preview image)
 - Unified signups/enquiries views in admin — every event's data in one sortable table each, with an event-name column ("Unassigned" for enquiries submitted from the homepage), each with its own CSV export
 - Gallery password shown with a copy-to-clipboard button on the public page and included in the "photos ready" notification email
-- Homepage leads with a swipeable carousel — latest event first (gold accent), then up to 7 past events with thumbnails (teal accent), arrow-navigable; visitors click in themselves, no auto-redirect
+- Homepage leads with a swipeable carousel — latest event first (gold accent), then up to 7 past events with thumbnails (teal accent), arrow-navigable, full-width cards matching the rest of the page; visitors click in themselves, no auto-redirect
 - Per-event "show on homepage" toggle in the admin dashboard — instantly include/exclude an event from the carousel
-- One-click "save to contacts" button generates a vCard (.vcf) for the primary contact
+- Live-now indicator (red border + pulsing "LIVE NOW" badge) triggers from either a matching event date or an admin-set `live` status
+- Themed icon on every card plus CTA buttons filled with their card's accent color, for quick visual scanning
+- One-click "save to contacts" button generates a vCard (.vcf) for the primary contact, including phone and website
 - IP rate limiting on signup and enquiry endpoints
 - Auto-applies DB schema on startup — no manual migration step needed
 - Server-rendered Jinja2 templates, no frontend build step
@@ -129,9 +131,11 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - [x] Event thumbnails — manual upload or auto-pulled from the gallery's preview image
 - [x] Homepage carousel — looping, arrow-navigable, latest event + up to 7 past events, with a live-now badge
 - [x] Gallery password with copy-to-clipboard, shown on the public page and in the notification email
-- [x] Save-to-contacts vCard button
+- [x] Save-to-contacts vCard button (name, phone, website)
 - [x] Unified signups/enquiries admin views with per-event CSV export
 - [x] CDN caching disabled for all dynamic routes (prevents stale/authenticated pages being served to the wrong visitor)
+- [x] Themed per-card icons and accent-matched CTA button colors across every public page
+- [x] Live status can be set manually in admin, independent of the event date
 
 **Future Roadmap / Suggestions**
 
@@ -154,6 +158,8 @@ Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`)
 
 Summarised from commit history, most recent first.
 
+- **2026-08-07 (1.2.0)** — Every card gets a themed icon; CTA buttons filled with their card's accent color instead of a mixed outline/filled style; homepage carousel cards widened to match every other card; "LIVE NOW" badge now blinks/pulses; gallery-thumbnail fetch spoofs a browser User-Agent (fixes 403s from Cloudflare-fronted hosts like Pixieset); save-to-contacts vCard now includes the website URL
+- **2026-08-07** — Wordmark scaled to full width to match the cards; badges get a border + underline to read as clickable, third badge now reads "Featured in Straits Times + LHZB"; live badge/border now also triggers from an admin-set "live" status, not only a matching event date; CTA button colors matched to their card instead of a mismatched teal/gold mix; removed the redundant "scan the QR code" homepage card; footer credit line added
 - **2026-08-07 (1.1.0)** — New "Accurova Live Event" banner replaces the old logo + separate text title site-wide, now clickable straight to the homepage
 - **2026-08-07** — Static assets (`style.css`, etc.) now cache-busted with a version query param, so a redeploy's fixes aren't stuck behind a stale CDN/browser cache — the /static exemption from the no-store middleware had let this happen silently
 - **2026-08-07** — Homepage carousel now loops seamlessly (clones + silent snap-back instead of a hard stop); live events get a "LIVE NOW" badge wherever they appear; event thumbnails and gallery password added to the individual event subpage; header reordered banner-first
