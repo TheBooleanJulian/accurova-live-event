@@ -152,6 +152,21 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - Admin audit log — track who changed event status/gallery URLs and when, useful once multi-admin access lands
 - CRM/webhook integration — push new signups and enquiries to Zapier/Make or a webhook endpoint in real time
 
+**Proposed Event-Page Redesign**
+
+Reshape the per-event page around a single hierarchy — logo → current event → huge "View Gallery" CTA → gallery preview → trust badges → soft sales pitch → contact grid → footer — instead of today's equal-weight card grid:
+
+- Hero: banner + one-line positioning ("Corporate Event Photography") + star rating + "Trusted by leading companies in Singapore"
+- Gallery section promoted to the main focus, with live status ("🔴 LIVE NOW"), last-updated time, and photo count surfaced next to the CTA (e.g. "Last updated: 2:15 PM · 428 photos available") to reassure attendees more are coming
+- Compact, visual-only trust strip (award, rating, press mentions) — no paragraphs
+- Soft-sell section explaining what Accurova shoots (conferences, launches, awards, executive events) ending in a single "Request a Quote" CTA
+- Contact options condensed into a simple grid (WhatsApp, Portfolio, LinkedIn, Save Contact)
+- "Book Consultation" and top-of-page LinkedIn demoted/relocated — currently competing for attention with primary actions
+
+**Long-Term Vision — Auto-Generated Event Pages**
+
+Every event should get its own page automatically at `live-event.accurova.com/{event-name}`, each with a different cover image, gallery, and client logo but consistent Accurova branding and CTA. Over time this builds a library of event pages that double as galleries and proof of experience — every attendee becomes a potential future client or referral, turning each event page into a reusable marketing asset instead of a one-time gallery.
+
 Have another idea? Open an issue or use the feedback form below.
 
 ## Changelog
