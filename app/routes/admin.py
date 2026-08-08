@@ -18,11 +18,12 @@ from app.security import (
     require_admin,
 )
 from app.email_client import send_email, photos_ready_email_html
-from app.config import settings
+from app.config import settings, thumb_v
 
 router = APIRouter(prefix="/admin")
 templates = Jinja2Templates(directory="app/templates")
 templates.env.globals["asset_v"] = settings.ASSET_V
+templates.env.globals["thumb_v"] = thumb_v
 
 
 def _slugify(value: str) -> str:
@@ -54,14 +55,20 @@ THUMBNAIL_CONTENT_TYPES = {
 }
 
 
-def _save_thumbnail(event_id: int, content_type: str, data: bytes) -> str:
+def _save_thumbnail(event_id: int, content_type: str, data: bytes, old_thumbnail_path: str | None = None) -> str:
     """Writes a thumbnail to UPLOADS_DIR and returns its public web path. Filename is
     derived from event_id (not any client/remote-supplied name) so there's no
-    path-traversal surface, and any previous thumbnail for this event is overwritten."""
+    path-traversal surface, and any previous thumbnail for this event is overwritten.
+    If the old thumbnail had a different extension (e.g. a JPG replaced by a PNG),
+    the stale file is removed so it doesn't linger orphaned on disk."""
     ext = THUMBNAIL_CONTENT_TYPES[content_type]
     settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
     dest = settings.UPLOADS_DIR / f"event_{event_id}{ext}"
     dest.write_bytes(data)
+    if old_thumbnail_path:
+        old = settings.UPLOADS_DIR / Path(old_thumbnail_path).name
+        if old != dest:
+            old.unlink(missing_ok=True)
     return f"/uploads/event_{event_id}{ext}"
 
 
@@ -80,7 +87,7 @@ def _extract_preview_image_url(html: str) -> str | None:
     return match.group(1) if match else None
 
 
-def _fetch_gallery_thumbnail(event_id: int, gallery_url: str) -> str:
+def _fetch_gallery_thumbnail(event_id: int, gallery_url: str, old_thumbnail_path: str | None = None) -> str:
     """Fetches the gallery page, pulls its og:image/twitter:image preview, downloads
     it, and saves it as this event's thumbnail. Raises ValueError with a
     user-facing message on any failure (no preview tag, unsupported type, too big)."""
@@ -116,7 +123,7 @@ def _fetch_gallery_thumbnail(event_id: int, gallery_url: str) -> str:
     if len(img_resp.content) > THUMBNAIL_MAX_BYTES:
         raise ValueError("Gallery preview image is too large.")
 
-    return _save_thumbnail(event_id, content_type, img_resp.content)
+    return _save_thumbnail(event_id, content_type, img_resp.content, old_thumbnail_path=old_thumbnail_path)
 
 
 # --- Auth ---
@@ -264,7 +271,7 @@ def update_event(
         data = thumbnail.file.read(THUMBNAIL_MAX_BYTES + 1)
         if len(data) > THUMBNAIL_MAX_BYTES:
             raise HTTPException(status_code=400, detail="Thumbnail must be 25MB or smaller.")
-        thumbnail_path = _save_thumbnail(event_id, thumbnail.content_type, data)
+        thumbnail_path = _save_thumbnail(event_id, thumbnail.content_type, data, old_thumbnail_path=thumbnail_path)
     elif remove_thumbnail == "on":
         if thumbnail_path:
             old = settings.UPLOADS_DIR / Path(thumbnail_path).name
@@ -332,7 +339,7 @@ def fetch_thumbnail(request: Request, event_id: int):
         )
 
     try:
-        thumbnail_path = _fetch_gallery_thumbnail(event_id, event["gallery_url"])
+        thumbnail_path = _fetch_gallery_thumbnail(event_id, event["gallery_url"], old_thumbnail_path=event["thumbnail_path"])
         with db_cursor() as cur:
             cur.execute("UPDATE events SET thumbnail_path = ? WHERE id = ?", (thumbnail_path, event_id))
         return RedirectResponse(
