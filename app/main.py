@@ -2,7 +2,7 @@ from datetime import date
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from migrations.init_db import init_db
@@ -96,4 +96,13 @@ def root(request: Request):
 
 @app.get("/healthz")
 def healthz():
+    """
+    Zeabur (or any platform doing a health-checked rolling deploy) hits this
+    before swapping traffic to a new instance — it must fail until the DB is
+    actually reachable, not just report the process booted.
+    """
+    try:
+        query_one("SELECT 1")
+    except Exception as exc:  # noqa: BLE001 — any DB failure means "not ready"
+        return JSONResponse({"status": "error", "detail": str(exc)}, status_code=503)
     return {"status": "ok", "env": settings.ENV}

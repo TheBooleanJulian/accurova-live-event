@@ -16,6 +16,10 @@ def _resolve_path(value: str) -> Path:
 
 
 class Settings:
+    # When set (e.g. postgres://user:pass@host:5432/db), app/db.py uses Postgres
+    # instead of the local SQLite file — required for zero-downtime rolling
+    # deploys, since SQLite can't be shared by two live instances at once.
+    DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
     DB_PATH: Path = _resolve_path(os.environ.get("DB_PATH", "./data/live_event.db"))
     UPLOADS_DIR: Path = _resolve_path(os.environ.get("UPLOADS_DIR", "./data/uploads"))
     SESSION_SECRET: str = os.environ.get("SESSION_SECRET", "dev-insecure-secret-change-me")

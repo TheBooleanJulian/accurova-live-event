@@ -6,7 +6,7 @@
 
 ![Accurova Live Event](assets/accurova-live-event-card.png)
 
-![Version](https://img.shields.io/badge/version-1.38.0-00D4C8)
+![Version](https://img.shields.io/badge/version-1.39.0-00D4C8)
 ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
 ![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -69,7 +69,8 @@ Visit `http://localhost:8000/admin`, log in with `ADMIN_PASSWORD`, create an eve
 |---|---|---|
 | `SESSION_SECRET` | Yes | Signs the admin session cookie — generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `ADMIN_PASSWORD` | Yes | Single-operator admin password |
-| `DB_PATH` | Yes | Path to the SQLite file (e.g. `./data/live_event.db`) |
+| `DATABASE_URL` | No | Postgres connection string — when set, the app uses Postgres instead of SQLite (required for zero-downtime rolling deploys, see [Deployment](#deployment)) |
+| `DB_PATH` | No | Path to the SQLite file, used only when `DATABASE_URL` is unset (e.g. `./data/live_event.db`) |
 | `UPLOADS_DIR` | No | Directory for uploaded event thumbnails, served at `/uploads/*` (default: `./data/uploads`) |
 | `PUBLIC_BASE_URL` | Yes | Base URL of the deployment |
 | `WHATSAPP_URL` | No | Single destination every "Message on WhatsApp" CTA site-wide links to |
@@ -94,7 +95,7 @@ Set `EMAIL_PROVIDER=none` for local dev — signups and enquiries are still stor
 app/
   main.py              # FastAPI app entrypoint
   config.py            # env-driven settings
-  db.py                # SQLite connection helpers
+  db.py                # SQLite/Postgres connection helpers (backend picked by DATABASE_URL)
   security.py          # admin session auth + IP rate limiter
   email_client.py      # pluggable email sender (Resend/Postmark/SMTP)
   routes/
@@ -105,8 +106,10 @@ app/
     admin/             # login, dashboard, event detail
   static/css/style.css # design system
 migrations/
-  schema.sql           # CREATE TABLE ... IF NOT EXISTS
-  init_db.py           # idempotent schema runner
+  schema.sql               # SQLite schema — CREATE TABLE ... IF NOT EXISTS
+  schema_postgres.sql       # Postgres equivalent, kept in sync with schema.sql
+  init_db.py                # idempotent schema runner, backend picked by DATABASE_URL
+  migrate_sqlite_to_postgres.py  # one-time data copy for the Postgres cutover
 .github/workflows/     # CI: lint/build check on push
 .env.example
 requirements.txt
@@ -116,7 +119,23 @@ requirements.txt
 
 Deployed on Zeabur via GitHub CI/CD. Push to `main` triggers deploy. Branch flow: `feature → dev → main`.
 
-Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/data`) — without it, every redeploy wipes events, signups, enquiries, and uploaded thumbnails.
+Mount a persistent volume covering `UPLOADS_DIR` (e.g. `/app/data`) — without it, every redeploy wipes uploaded thumbnails. If still on SQLite, this volume must also cover `DB_PATH`.
+
+### Zero-downtime deploys (Postgres cutover)
+
+By default this app runs on a SQLite file on a persistent volume. That's simple, but SQLite is single-writer/single-process — it cannot be shared by two live instances at once, which is exactly what a zero-downtime rolling deploy needs (old instance still serving while the new one boots). Every redeploy therefore has a gap where Zeabur stops the old container before the new one is ready (the "Bad Gateway while redeploying" behavior).
+
+To fix this, point the app at Postgres instead — a real client-server DB that two instances can safely share:
+
+1. **Provision Postgres.** Add Zeabur's managed Postgres to the project (or bring your own). Zeabur gives you a connection string.
+2. **Set `DATABASE_URL`** on the service to that connection string. `app/db.py` switches to Postgres automatically whenever it's set — no code changes needed.
+3. **Apply the schema:** `DATABASE_URL=... python migrations/init_db.py` (idempotent, safe to re-run).
+4. **Copy existing data once:** `SQLITE_PATH=./data/live_event.db DATABASE_URL=... python migrations/migrate_sqlite_to_postgres.py` — copies `events`, `email_signups`, `enquiries` in FK-safe order and bumps Postgres's sequences past the migrated ids.
+5. **Verify before cutting over:** hit `/healthz` against the new instance — it now checks DB connectivity (`SELECT 1`) and returns `503` if the database isn't reachable, so Zeabur's health check can correctly gate the traffic swap instead of just checking "did the process boot."
+6. **Enable rolling/zero-downtime deploy** in the Zeabur service settings (health-check-gated instance swap). With both old and new instances now able to safely share the same live Postgres database, Zeabur can start the new one, wait for `/healthz` to pass, then swap traffic — no gap.
+7. Once confirmed working, `DB_PATH`/the SQLite volume can be dropped from the service.
+
+> Not yet verified against a live Postgres instance in this repo's dev environment (no Postgres/Docker available there) — validate steps 3–6 against Zeabur's actual managed Postgres (or any Postgres you control) before relying on it in production.
 
 ## Status / Roadmap
 
@@ -139,9 +158,11 @@ Mount a persistent volume covering both `DB_PATH` and `UPLOADS_DIR` (e.g. `/app/
 - [x] Themed per-card icons and accent-matched CTA button colors across every public page
 - [x] Live status can be set manually in admin, independent of the event date
 - [x] Public pages (homepage + event page) redesigned around a single hierarchy — hero, gallery/CTA, compact trust strip, soft-sell pitch, contact grid, footer
+- [x] Optional Postgres backend (`DATABASE_URL`) alongside SQLite, `/healthz` checks real DB connectivity — code path in place for zero-downtime rolling deploys; **not yet verified against a live Postgres**, see [Deployment](#deployment)
 
 **Future Roadmap / Suggestions**
 
+- Verify the Postgres cutover end-to-end against Zeabur's managed Postgres and enable rolling/zero-downtime deploy in the service settings
 - Automated test suite — no test files exist yet; add at minimum smoke tests for the signup/enquiry endpoints and the `photos_ready` status-transition/notification logic
 - Multi-admin / role-based access — move off the single shared `ADMIN_PASSWORD` toward per-operator accounts with scoped permissions
 - Event templates & duplication — clone a past event's settings (branding, links, email copy) instead of re-entering them each time
@@ -177,6 +198,7 @@ Summarised from commit history, most recent first.
 
 Every distinct feature or fix gets its own `MINOR` bump for full traceability — versions increment `+0.1` per change rather than batching multiple changes under one release.
 
+- **2026-08-08 (1.39.0)** — Added optional Postgres backend (`DATABASE_URL`) alongside SQLite, plus a data-migration script and DB-aware `/healthz`, laying the groundwork for zero-downtime rolling deploys on Zeabur (SQLite can't be shared by two live instances at once, which is why redeploys currently have a Bad Gateway gap)
 - **2026-08-08 (1.38.0)** — Gallery password merged into the "photos are ready" card (was a separate, easy-to-miss card below); clicking "View & Download Photos" now copies the password to the clipboard automatically
 - **2026-08-08 (1.37.0)** — Fixed re-uploaded event thumbnails appearing unchanged (`/uploads` is cacheable and re-uploads reused the same filename) by cache-busting the `<img>` src with the file's mtime; also fixed an orphaned-file leak when a re-upload changes image type
 - **2026-08-07 (1.36.0)** — Homepage and event page redesigned around a single hierarchy (hero, gallery/CTA, compact trust strip, soft-sell pitch, contact grid); "Book Consultation" and standalone LinkedIn cards folded into the new soft-sell CTA and contact grid
