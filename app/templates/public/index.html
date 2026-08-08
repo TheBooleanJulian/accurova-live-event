@@ -35,7 +35,17 @@
     <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.2h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.2" r="3.3"/></svg></span>
     <p class="card-title">Your photos are ready</p>
     <p class="card-desc">The full gallery from today's event has been processed and is ready to view and download.</p>
-    <a class="btn btn-gold" href="{{ event.gallery_url }}" target="_blank" rel="noopener">View &amp; Download Photos</a>
+    {% if event.gallery_password %}
+    <div class="gallery-password">
+      <span class="gallery-password-label">Gallery password — copied automatically when you tap below</span>
+      <div class="gallery-password-row">
+        <code id="gallery-password-value">{{ event.gallery_password }}</code>
+        <button type="button" class="btn-copy" id="copy-password-btn">Copy</button>
+      </div>
+    </div>
+    {% endif %}
+    <a class="btn btn-gold" href="{{ event.gallery_url }}" target="_blank" rel="noopener" id="view-gallery-link">View &amp; Download Photos</a>
+    <p id="gallery-password-copied-note" class="form-note" style="display:none;">Password copied — paste it if the gallery site asks.</p>
   </div>
   {% else %}
   <div class="card card-primary{% if is_live %} is-live{% endif %}">
@@ -52,7 +62,7 @@
   </div>
   {% endif %}
 
-  {% if event.gallery_password %}
+  {% if event.gallery_password and not (event.status == "photos_ready" and event.gallery_url) %}
   <div class="card">
     <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
     <p class="card-title">Gallery password</p>
@@ -203,30 +213,47 @@ enquiryForm.addEventListener('submit', async (e) => {
   }
 });
 
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
 const copyPasswordBtn = document.getElementById('copy-password-btn');
 if (copyPasswordBtn) {
   copyPasswordBtn.addEventListener('click', async () => {
     const password = document.getElementById('gallery-password-value').textContent;
     const originalLabel = copyPasswordBtn.textContent;
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(password);
-      } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = password;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
+      await copyText(password);
       copyPasswordBtn.textContent = 'Copied!';
     } catch (err) {
       copyPasswordBtn.textContent = 'Copy failed';
     }
     setTimeout(() => { copyPasswordBtn.textContent = originalLabel; }, 2000);
+  });
+}
+
+const viewGalleryLink = document.getElementById('view-gallery-link');
+const passwordValueEl = document.getElementById('gallery-password-value');
+if (viewGalleryLink && passwordValueEl) {
+  viewGalleryLink.addEventListener('click', async () => {
+    try {
+      await copyText(passwordValueEl.textContent);
+      document.getElementById('gallery-password-copied-note').style.display = 'block';
+    } catch (err) {
+      // Clipboard write failed silently — the password is still visible/copyable above.
+    }
   });
 }
 </script>
