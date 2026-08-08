@@ -1,5 +1,4 @@
 import re
-import sqlite3
 from datetime import date
 
 from fastapi import APIRouter, Request, HTTPException
@@ -8,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, EmailStr, field_validator
 
 from app.config import settings, thumb_v
-from app.db import db_cursor, query_one
+from app.db import IntegrityError, db_cursor, query_one
 from app.security import enforce_rate_limit
 
 router = APIRouter()
@@ -104,7 +103,7 @@ def event_signup(slug: str, payload: SignupPayload, request: Request):
                 "INSERT INTO email_signups (event_id, name, email) VALUES (?, ?, ?)",
                 (event["id"], payload.name, payload.email),
             )
-    except sqlite3.IntegrityError:
+    except IntegrityError:
         # Already signed up for this event — treat as success, no need to error.
         pass
 
