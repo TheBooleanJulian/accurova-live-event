@@ -24,7 +24,7 @@
     <div class="event-carousel" id="event-carousel">
       <a class="carousel-card carousel-card-featured{% if latest_is_live %} is-live{% endif %}" href="/e/{{ latest_event.slug }}">
         {% if latest_event.thumbnail_path %}
-        <img src="{{ latest_event.thumbnail_path }}" alt="{{ latest_event.name }}" class="carousel-card-thumb" />
+        <img src="{{ latest_event.thumbnail_path }}?v={{ thumb_v(latest_event.thumbnail_path) }}" alt="{{ latest_event.name }}" class="carousel-card-thumb" />
         {% endif %}
         <div class="carousel-card-body">
           <p class="section-title" style="margin:0 0 4px;">Latest event</p>
@@ -36,7 +36,7 @@
       {% for e in past_events %}
       {% set e_is_live = e.event_date == today or e.status == "live" %}
       <a class="carousel-card{% if e_is_live %} is-live{% endif %}" href="/e/{{ e.slug }}">
-        <img src="{{ e.thumbnail_path }}" alt="{{ e.name }}" class="carousel-card-thumb" loading="lazy" />
+        <img src="{{ e.thumbnail_path }}?v={{ thumb_v(e.thumbnail_path) }}" alt="{{ e.name }}" class="carousel-card-thumb" loading="lazy" />
         <div class="carousel-card-body">
           <p class="card-title" style="margin:0;">{{ e.name }}</p>
           {% if e_is_live %}<p class="live-badge" style="margin:6px 0 0;"><span class="live-dot">🔴</span> LIVE NOW</p>{% endif %}

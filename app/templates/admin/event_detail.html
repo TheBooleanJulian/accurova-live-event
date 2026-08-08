@@ -43,7 +43,7 @@
       <label class="form-note" style="display:block; margin-bottom:6px;">Thumbnail (shown in the "past events" showcase on the homepage)</label>
       {% if event.thumbnail_path %}
       <div style="margin-bottom:10px;">
-        <img src="{{ event.thumbnail_path }}" alt="" style="max-width:160px; border-radius:6px; border:1px solid var(--hairline); display:block; margin-bottom:6px;" />
+        <img src="{{ event.thumbnail_path }}?v={{ thumb_v(event.thumbnail_path) }}" alt="" style="max-width:160px; border-radius:6px; border:1px solid var(--hairline); display:block; margin-bottom:6px;" />
         <label style="font-size:12px; color:var(--ink-dim);"><input type="checkbox" name="remove_thumbnail" style="width:auto; margin-right:6px;" /> Remove thumbnail</label>
       </div>
       {% endif %}

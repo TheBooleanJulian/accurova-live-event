@@ -27,7 +27,7 @@
   {% endif %}
 
   {% if event.thumbnail_path %}
-  <img src="{{ event.thumbnail_path }}" alt="{{ event.name }}" class="event-thumb" />
+  <img src="{{ event.thumbnail_path }}?v={{ thumb_v(event.thumbnail_path) }}" alt="{{ event.name }}" class="event-thumb" />
   {% endif %}
 
   {% if event.status == "photos_ready" and event.gallery_url %}

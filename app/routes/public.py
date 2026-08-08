@@ -7,13 +7,14 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, EmailStr, field_validator
 
-from app.config import settings
+from app.config import settings, thumb_v
 from app.db import db_cursor, query_one
 from app.security import enforce_rate_limit
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 templates.env.globals["asset_v"] = settings.ASSET_V
+templates.env.globals["thumb_v"] = thumb_v
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 

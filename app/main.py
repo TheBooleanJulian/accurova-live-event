@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 
 from migrations.init_db import init_db
 from app.routes import public, admin
-from app.config import settings
+from app.config import settings, thumb_v
 from app.db import query_all, query_one
 
 app = FastAPI(title="Accurova Live Event", docs_url=None, redoc_url=None)
@@ -43,6 +43,7 @@ def _apply_schema() -> None:
 
 templates = Jinja2Templates(directory="app/templates")
 templates.env.globals["asset_v"] = settings.ASSET_V
+templates.env.globals["thumb_v"] = thumb_v
 
 settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 

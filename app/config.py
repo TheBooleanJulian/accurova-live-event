@@ -56,3 +56,16 @@ class Settings:
 
 
 settings = Settings()
+
+
+def thumb_v(web_path: str | None) -> int:
+    """Cache-busting query value for an uploaded thumbnail. /uploads is exempt
+    from the no-store middleware (see main.py) so it can be cached, but a
+    re-uploaded thumbnail reuses the same filename (event_{id}.ext) — without
+    this, a browser or CDN keeps serving the old image at that URL forever."""
+    if not web_path:
+        return 0
+    try:
+        return int((settings.UPLOADS_DIR / Path(web_path).name).stat().st_mtime)
+    except OSError:
+        return 0
