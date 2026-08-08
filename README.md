@@ -6,7 +6,7 @@
 
 ![Accurova Live Event](assets/accurova-live-event-card.png)
 
-![Version](https://img.shields.io/badge/version-1.36.0-00D4C8)
+![Version](https://img.shields.io/badge/version-1.37.0-00D4C8)
 ![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
 ![SQLite](https://img.shields.io/badge/-SQLite-003B57?logo=sqlite&logoColor=white)
@@ -177,6 +177,7 @@ Summarised from commit history, most recent first.
 
 Every distinct feature or fix gets its own `MINOR` bump for full traceability — versions increment `+0.1` per change rather than batching multiple changes under one release.
 
+- **2026-08-08 (1.37.0)** — Fixed re-uploaded event thumbnails appearing unchanged (`/uploads` is cacheable and re-uploads reused the same filename) by cache-busting the `<img>` src with the file's mtime; also fixed an orphaned-file leak when a re-upload changes image type
 - **2026-08-07 (1.36.0)** — Homepage and event page redesigned around a single hierarchy (hero, gallery/CTA, compact trust strip, soft-sell pitch, contact grid); "Book Consultation" and standalone LinkedIn cards folded into the new soft-sell CTA and contact grid
 - **2026-08-07 (1.35.0)** — README hero image added
 - **2026-08-07 (1.34.0)** — Save-to-contacts vCard now includes the website URL
