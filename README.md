@@ -38,6 +38,12 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 - Auto-applies DB schema on startup — no manual migration step needed
 - Server-rendered Jinja2 templates, no frontend build step
 
+## Screenshots
+
+![Accurova Live Event card](assets/accurova-live-event-card.png)
+
+![Accurova Live Event wordmark](assets/accurova-live-event.png)
+
 ## Tech Stack
 
 | Layer | Choice |
@@ -245,7 +251,10 @@ Found a bug or have feedback? Submit it via [this form](https://forms.gle/qRCimS
 
 ## License
 
-Dual-licensed. See [`LICENSE`](LICENSE) (open-source terms) and [`COMMERCIAL-LICENSE.md`](COMMERCIAL-LICENSE.md) (commercial terms).
+This project is dual licensed.
+
+- Community Edition — [GNU Affero General Public License v3 (AGPLv3)](LICENSE). Free to use, modify, and self-host. If you distribute a modified version or run it as a network service, you must make the corresponding source available.
+- Commercial License — for organisations that want to embed, modify, or distribute this software without AGPLv3's obligations. See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).
 
 ---
 
