@@ -1,0 +1,29 @@
+{
+  // Accurova Live Event on Cloudflare Workers (replaces app/ on Zeabur). worker/ renders the same pages; app/static is
+  // served at /static (app/.assetsignore keeps the Python code and Jinja templates unserved); thumbnails live in R2.
+  // Data: schema accurova_live_event (thebooleanjulian-db migration 20261112090000) via Hyperdrive.
+  // Secrets: ADMIN_PASSWORD, SESSION_SECRET (both required for /admin); RESEND_API_KEY or POSTMARK_SERVER_TOKEN only
+  // if EMAIL_PROVIDER is set. Contact/link vars default to the values in app/config.py.
+  "name": "accurova-live-event",
+  "account_id": "c580c4403524273d1bece674117472dd",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "build": { "command": "npm ci --prefix worker" },
+  "assets": {
+    "directory": "./app",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "vars": { "EMAIL_PROVIDER": "none" },
+  "r2_buckets": [{ "binding": "UPLOADS", "bucket_name": "accurova-live-event" }],
+  // Signups and enquiries: 5 per minute per IP per form, like RATE_LIMIT_MAX_REQUESTS / _WINDOW_SECONDS.
+  "ratelimits": [{ "name": "FORM_LIMIT", "namespace_id": "1103", "simple": { "limit": 5, "period": 60 } }],
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
+  // Cutover, in order (see README "Deploying (Cloudflare Workers)"): apply + provision accurova_live_event in
+  // thebooleanjulian-db, copy the SQLite data and thumbnails, set the two secrets, then uncomment both blocks and deploy.
+  // "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "<accurova-live-event-db id from provision.mjs>" }],
+  // "routes": [{ "pattern": "live-event.accurova.com", "custom_domain": true }],
+  "observability": { "enabled": true }
+}
