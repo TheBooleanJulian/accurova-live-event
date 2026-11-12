@@ -1,0 +1,6 @@
+# Only app/static is public (served at /static/...). The Python app and Jinja templates stay unserved.
+*.py
+__pycache__
+routes
+templates
+.assetsignore
