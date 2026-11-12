@@ -48,9 +48,10 @@ Attendees scan a QR code at a live corporate event and land on a mobile-first pa
 
 | Layer | Choice |
 |---|---|
-| Backend | FastAPI + SQLite (raw SQL, no ORM) |
-| Frontend | Server-rendered Jinja2 + vanilla JS |
-| Hosting | Zeabur (GitHub CI/CD, feature → dev → main) |
+| Backend (production) | Cloudflare Worker (`worker/`): same routes and pages, Postgres via Hyperdrive, thumbnails in R2 |
+| Backend (local) | FastAPI + SQLite or Postgres (raw SQL, no ORM) in `app/` |
+| Frontend | Server-rendered HTML + vanilla JS (`app/static/js`) |
+| Hosting | Cloudflare Workers at live-event.accurova.com (feature → dev → main) |
 
 ## Quick Start
 
@@ -121,9 +122,28 @@ migrations/
 requirements.txt
 ```
 
-## Deployment
+## Deploying (Cloudflare Workers)
 
-Deployed on Zeabur via GitHub CI/CD. Push to `main` triggers deploy. Branch flow: `feature → dev → main`.
+Production is the Worker in `worker/` (`wrangler.jsonc`). It mirrors `app/` route for route: the Jinja templates are
+JS functions in `worker/views.js` (same markup, autoescaped), the inline page scripts are `app/static/js/{event,home}.js`,
+the data is schema `accurova_live_event` in the shared Supabase project (migration in `thebooleanjulian-db`), and
+thumbnails are in the R2 bucket `accurova-live-event`, served at the same `/uploads/event_<id>.<ext>` paths. Two
+deliberate differences: no default admin password or session secret (unset = admin locked), and email goes through
+Resend or Postmark only (`EMAIL_PROVIDER=smtp` has no Workers equivalent).
+
+Cutover, in order:
+1. In `thebooleanjulian-db`: `apply.mjs`, then `provision.mjs <env> accurova_live_event <out dir>` (prints the Hyperdrive id).
+2. Copy the data off the Zeabur volume: download `data/live_event.db` and `data/uploads/*`, then
+   `SQLITE_PATH=live_event.db DATABASE_URL='<connection string>?options=-csearch_path%3Daccurova_live_event' python migrations/migrate_sqlite_to_postgres.py`,
+   and `npx wrangler r2 object put accurova-live-event/<file> --file <file> --remote` for each thumbnail.
+3. `npx wrangler secret put ADMIN_PASSWORD` (same as Zeabur) and `SESSION_SECRET` (new, long random).
+4. Uncomment `hyperdrive` and `routes` in `wrangler.jsonc`, `npx wrangler deploy`, check `/healthz`, an event page and the admin.
+
+Tests: `cd worker && npm install && node --test`. They run the real schema on an embedded Postgres (PGlite, dev-only).
+
+### Legacy: Zeabur
+
+Deployed on Zeabur via GitHub CI/CD until the cutover above. Push to `main` triggers deploy.
 
 Mount a persistent volume covering `UPLOADS_DIR` (e.g. `/app/data`) — without it, every redeploy wipes uploaded thumbnails. If still on SQLite, this volume must also cover `DB_PATH`.
 
@@ -201,6 +221,8 @@ Have another idea? Open an issue or use the feedback form below.
 Versions follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`).
 
 Summarised from commit history, most recent first.
+
+- **Unreleased** — Cloudflare Worker port (`worker/`, Supabase schema `accurova_live_event`, R2 thumbnails), staged for cutover off Zeabur. Fixes the admin delete confirmation, which never showed (the event name's JSON quotes ended the `onsubmit` attribute early, so deletes went through unconfirmed). Admin now requires `ADMIN_PASSWORD` and `SESSION_SECRET` (no defaults).
 
 Every distinct feature or fix gets its own `MINOR` bump for full traceability — versions increment `+0.1` per change rather than batching multiple changes under one release.
 
